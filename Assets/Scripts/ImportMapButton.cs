@@ -6,11 +6,16 @@ public class ImportMapButton : MonoBehaviour
 {
     public void ImportMap()
     {
+        // Allow these file types
+        var extensions = new[] {
+            new ExtensionFilter("Image Files", "png", "jpg", "jpeg")
+        };
+
         // Open file browser
         var paths = StandaloneFileBrowser.OpenFilePanel(
             "Select Map Image",
             "",
-            "png",
+            extensions,
             false
         );
 
