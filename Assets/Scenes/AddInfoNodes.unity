@@ -1418,6 +1418,7 @@ GameObject:
   - component: {fileID: 1598337229}
   - component: {fileID: 1598337228}
   - component: {fileID: 1598337227}
+  - component: {fileID: 1598337230}
   m_Layer: 5
   m_Name: MapImage
   m_TagString: Untagged
@@ -1494,6 +1495,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1598337225}
   m_CullTransparentMesh: 1
+--- !u!114 &1598337230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1598337225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b81864440f31ace4c9dbe908d7fcb176, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapController
+  mapWindow: {fileID: 863549278}
+  zoomSpeed: 0.1
+  minScale: 1
+  maxScale: 3
 --- !u!1 &2122923730
 GameObject:
   m_ObjectHideFlags: 0
