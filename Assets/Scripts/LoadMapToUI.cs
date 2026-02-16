@@ -7,16 +7,25 @@ public class LoadMapToUI : MonoBehaviour
 {
     void Start()
     {
-        string path = PlayerPrefs.GetString("LastMapPath", "");
+        string folder = PlayerPrefs.GetString("LastMapFolder", "");
 
-        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+        if (string.IsNullOrEmpty(folder))
         {
-            Debug.LogError("Map not found.");
+            Debug.LogError("No map folder saved.");
+            return;
+        }
+
+        string path = Path.Combine(folder, "map.png");
+
+        if (!File.Exists(path))
+        {
+            Debug.LogError("Map not found at: " + path);
             return;
         }
 
         StartCoroutine(LoadImage(path));
     }
+
 
     IEnumerator LoadImage(string path)
     {

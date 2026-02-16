@@ -6,12 +6,10 @@ public class ImportMapButton : MonoBehaviour
 {
     public void ImportMap()
     {
-        // Allow these file types
         var extensions = new[] {
             new ExtensionFilter("Image Files", "png", "jpg", "jpeg")
         };
 
-        // Open file browser
         var paths = StandaloneFileBrowser.OpenFilePanel(
             "Select Map Image",
             "",
@@ -19,7 +17,6 @@ public class ImportMapButton : MonoBehaviour
             false
         );
 
-        // If user cancels, stop
         if (paths.Length == 0 || paths[0] == "")
             return;
 
@@ -31,21 +28,42 @@ public class ImportMapButton : MonoBehaviour
             return;
         }
 
-        // Create images folder in persistent storage
-        string imagesFolder = Path.Combine(Application.persistentDataPath, "images");
+        // Root maps directory
+        string mapsRoot = Path.Combine(Application.persistentDataPath, "maps");
 
-        if (!Directory.Exists(imagesFolder))
-            Directory.CreateDirectory(imagesFolder);
+        if (!Directory.Exists(mapsRoot))
+            Directory.CreateDirectory(mapsRoot);
 
-        // Copy image into app folder
-        string fileName = Path.GetFileName(sourcePath);
-        string destinationPath = Path.Combine(imagesFolder, fileName);
+        // Find next available map folder name
+        int mapIndex = 0;
+        string mapFolder;
 
-        File.Copy(sourcePath, destinationPath, true);
+        do
+        {
+            mapFolder = Path.Combine(mapsRoot, "map" + mapIndex);
+            mapIndex++;
+        }
+        while (Directory.Exists(mapFolder));
 
-        Debug.Log("Map imported to: " + destinationPath);
+        // Create map folder
+        Directory.CreateDirectory(mapFolder);
 
-        PlayerPrefs.SetString("LastMapPath", destinationPath);
+        // Copy image as map.png
+        string destinationImage = Path.Combine(mapFolder, "map.png");
+        File.Copy(sourcePath, destinationImage, true);
+
+        Debug.Log("Map imported to: " + mapFolder);
+
+        // Create starter JSON file
+        string jsonPath = Path.Combine(mapFolder, "data.json");
+
+        if (!File.Exists(jsonPath))
+        {
+            File.WriteAllText(jsonPath, "{ \"nodes\": [] }");
+        }
+
+        // Save folder path for later use
+        PlayerPrefs.SetString("LastMapFolder", mapFolder);
         PlayerPrefs.Save();
     }
 }
