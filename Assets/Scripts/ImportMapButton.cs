@@ -10,7 +10,7 @@ public class ImportMapButton : MonoBehaviour
         var paths = StandaloneFileBrowser.OpenFilePanel(
             "Select Map Image",
             "",
-            "png,jpg,jpeg",
+            "png",
             false
         );
 
