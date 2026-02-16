@@ -34,8 +34,19 @@ public class LoadMapToUI : MonoBehaviour
         Image img = GetComponent<Image>();
         img.sprite = sprite;
 
+        // Fit image to window while maintaining aspect ratio
+        RectTransform windowRT = transform.parent.GetComponent<RectTransform>();
+        float windowWidth = windowRT.rect.width;
+        float windowHeight = windowRT.rect.height;
+
+        float scaleX = windowWidth / tex.width;
+        float scaleY = windowHeight / tex.height;
+
+        float scale = Mathf.Min(scaleX, scaleY);
+
         RectTransform rt = GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(tex.width, tex.height);
+        rt.sizeDelta = new Vector2(tex.width * scale, tex.height * scale);
+        rt.anchoredPosition = Vector2.zero;
 
         yield break;
     }
