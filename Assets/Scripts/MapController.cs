@@ -26,15 +26,36 @@ public class MapController : MonoBehaviour
     void HandleZoom()
     {
         float scroll = Input.mouseScrollDelta.y;
-        if (scroll != 0)
-        {
-            // Compute new scale
-            float scale = mapRT.localScale.x + scroll * zoomSpeed;
-            scale = Mathf.Clamp(scale, minScale, maxScale);
+        if (scroll == 0) return;
 
-            mapRT.localScale = new Vector3(scale, scale, 1f);
-        }
+        // Current scale
+        float oldScale = mapRT.localScale.x;
+
+        // Compute new scale
+        float newScale = Mathf.Clamp(oldScale + scroll * zoomSpeed, minScale, maxScale);
+
+        // Get mouse position in MapWindow local space
+        Vector2 localMousePos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            mapWindow,
+            Input.mousePosition,
+            null,
+            out localMousePos
+        );
+
+        // Compute normalized position (0 = map pivot, 1 = mouse)
+        Vector2 pivotDelta = localMousePos - mapRT.anchoredPosition;
+
+        // Scale the map
+        mapRT.localScale = new Vector3(newScale, newScale, 1f);
+
+        // Adjust anchoredPosition so point under mouse stays put
+        Vector2 newPivotDelta = pivotDelta * (newScale / oldScale);
+        mapRT.anchoredPosition += pivotDelta - newPivotDelta;
+
+        ClampToWindow();
     }
+
 
     void HandlePan()
     {
