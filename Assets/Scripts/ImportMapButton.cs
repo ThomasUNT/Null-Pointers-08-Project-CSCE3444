@@ -44,5 +44,8 @@ public class ImportMapButton : MonoBehaviour
         File.Copy(sourcePath, destinationPath, true);
 
         Debug.Log("Map imported to: " + destinationPath);
+
+        PlayerPrefs.SetString("LastMapPath", destinationPath);
+        PlayerPrefs.Save();
     }
 }
