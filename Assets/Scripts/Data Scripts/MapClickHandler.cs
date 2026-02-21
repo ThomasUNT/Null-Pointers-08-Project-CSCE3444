@@ -1,10 +1,10 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MapClickHandler : MonoBehaviour
 {
-    public Camera mapCamera;
+    public RectTransform mapRect;
     public MapDataManager dataManager;
-
     public bool placeMode = false;
 
     void Update()
@@ -13,14 +13,26 @@ public class MapClickHandler : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            Vector3 mousePos = Input.mousePosition;
-            Vector3 worldPos = mapCamera.ScreenToWorldPoint(mousePos);
+            Vector2 localPoint;
 
-            Vector2 mapPos = new Vector2(worldPos.x, worldPos.y);
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                mapRect,
+                Input.mousePosition,
+                null,
+                out localPoint))
+            {
+                Rect rect = mapRect.rect;
 
-            dataManager.AddNode(mapPos);
+                // convert to 0–1 range
+                float normalizedX = (localPoint.x - rect.x) / rect.width;
+                float normalizedY = (localPoint.y - rect.y) / rect.height;
 
-            Debug.Log("Node placed at: " + mapPos);
+                dataManager.AddNode(new Vector2(normalizedX, normalizedY));
+
+                Debug.Log($"Saved node at {normalizedX}, {normalizedY}");
+
+                placeMode = false;
+            }
         }
     }
 }

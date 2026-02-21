@@ -1440,13 +1440,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 263706678}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 263706679}
+        m_TargetAssemblyTypeName: UIController, Assembly-CSharp
+        m_MethodName: TogglePlaceMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1745,7 +1745,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67f6087142da09a4185f96a515c626bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapClickHandler
-  mapCamera: {fileID: 587027803}
+  mapRect: {fileID: 1598337226}
   dataManager: {fileID: 55223473}
   placeMode: 0
 --- !u!4 &2108143300

@@ -8,7 +8,15 @@ public class MapDataManager : MonoBehaviour
 
     void Awake()
     {
-        filePath = Path.Combine(Application.persistentDataPath, "data.json");
+        string folder = PlayerPrefs.GetString("LastMapFolder", "");
+
+        if (string.IsNullOrEmpty(folder))
+        {
+            Debug.LogError("No active map folder set!");
+            return;
+        }
+
+        filePath = Path.Combine(folder, "data.json");
         Load();
     }
 
