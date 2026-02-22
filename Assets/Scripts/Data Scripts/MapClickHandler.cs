@@ -23,9 +23,18 @@ public class MapClickHandler : MonoBehaviour
             {
                 Rect rect = mapRect.rect;
 
-                // convert to 0–1 range
+                // Convert to 0–1 range
                 float normalizedX = (localPoint.x - rect.x) / rect.width;
                 float normalizedY = (localPoint.y - rect.y) / rect.height;
+
+                // Ignore clicks outside map bounds
+                if (normalizedX < 0f || normalizedX > 1f ||
+                    normalizedY < 0f || normalizedY > 1f)
+                {
+                    Debug.Log("Clicked outside map bounds - ignoring.");
+                    placeMode = false;   // Optional: exit place mode
+                    return;
+                }
 
                 dataManager.AddNode(new Vector2(normalizedX, normalizedY));
 
