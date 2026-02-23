@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections;
 
 public class MapDataManager : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class MapDataManager : MonoBehaviour
 
     List<GameObject> spawnedIcons = new List<GameObject>();
 
-    void Awake()
+    void Start()
     {
         string folder = PlayerPrefs.GetString("LastMapFolder", "");
 
@@ -24,6 +25,14 @@ public class MapDataManager : MonoBehaviour
 
         filePath = Path.Combine(folder, "data.json");
         Load();
+
+        // Wait a frame to ensure UI layout is ready
+        StartCoroutine(DrawNodesNextFrame());
+    }
+
+    private IEnumerator DrawNodesNextFrame()
+    {
+        yield return null; // wait 1 frame
         DrawNodes();
     }
 
