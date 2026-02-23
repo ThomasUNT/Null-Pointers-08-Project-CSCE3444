@@ -43,8 +43,10 @@ public class MapDataManager : MonoBehaviour
 
         spawnedIcons.Clear();
 
-        foreach (var node in mapData.nodes)
+        for (int i = 0; i < mapData.nodes.Count; i++)
         {
+            var node = mapData.nodes[i];
+
             GameObject icon = Instantiate(nodeIconPrefab, mapRect);
 
             Rect rect = mapRect.rect;
@@ -56,7 +58,7 @@ public class MapDataManager : MonoBehaviour
                 new Vector2(xPos, yPos);
 
             icon.GetComponent<NodeIcon>()
-                .Initialize(mapData.nodes.IndexOf(node), editorUI);
+                .Initialize(i, editorUI);
 
             spawnedIcons.Add(icon);
         }
