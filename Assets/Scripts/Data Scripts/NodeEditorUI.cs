@@ -19,7 +19,7 @@ public class NodeEditorUI : MonoBehaviour
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
 
-        inputField.text = "";
+        inputField.text = dataManager.mapData.nodes[nodeIndex].text;
 
         // focus cursor automatically
         inputField.ActivateInputField();
@@ -36,6 +36,19 @@ public class NodeEditorUI : MonoBehaviour
 
         CloseEditor();
     }
+
+
+    public void DeleteNode()
+    {
+        if (activeNodeIndex < 0) return;
+
+        dataManager.mapData.nodes.RemoveAt(activeNodeIndex);
+        dataManager.Save();
+        dataManager.DrawNodes();
+
+        CloseEditor();
+    }
+
 
     public void CloseEditor()
     {

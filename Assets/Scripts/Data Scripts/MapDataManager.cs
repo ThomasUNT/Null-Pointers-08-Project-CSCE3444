@@ -1,10 +1,16 @@
 using UnityEngine;
 using System.IO;
+using System.Collections.Generic;
 
 public class MapDataManager : MonoBehaviour
 {
     public MapData mapData = new MapData();
     private string filePath;
+    public RectTransform mapRect;
+    public GameObject nodeIconPrefab;
+    public NodeEditorUI editorUI;
+
+    List<GameObject> spawnedIcons = new List<GameObject>();
 
     void Awake()
     {
@@ -18,6 +24,7 @@ public class MapDataManager : MonoBehaviour
 
         filePath = Path.Combine(folder, "data.json");
         Load();
+        DrawNodes();
     }
 
     public void AddNode(Vector2 position)
@@ -25,7 +32,36 @@ public class MapDataManager : MonoBehaviour
         NodeData node = new NodeData(position.x, position.y);
         mapData.nodes.Add(node);
         Save();
+        DrawNodes();
     }
+
+    public void DrawNodes()
+    {
+        // clear old icons
+        foreach (var icon in spawnedIcons)
+            Destroy(icon);
+
+        spawnedIcons.Clear();
+
+        foreach (var node in mapData.nodes)
+        {
+            GameObject icon = Instantiate(nodeIconPrefab, mapRect);
+
+            Rect rect = mapRect.rect;
+
+            float xPos = rect.x + node.x * rect.width;
+            float yPos = rect.y + node.y * rect.height;
+
+            icon.GetComponent<RectTransform>().anchoredPosition =
+                new Vector2(xPos, yPos);
+
+            icon.GetComponent<NodeIcon>()
+                .Initialize(mapData.nodes.IndexOf(node), editorUI);
+
+            spawnedIcons.Add(icon);
+        }
+    }
+
 
     public void Save()
     {
@@ -33,6 +69,7 @@ public class MapDataManager : MonoBehaviour
         File.WriteAllText(filePath, json);
         Debug.Log("Saved to: " + filePath);
     }
+
 
     public void Load()
     {
