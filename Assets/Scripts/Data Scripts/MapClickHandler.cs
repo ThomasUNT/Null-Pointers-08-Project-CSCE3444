@@ -6,6 +6,7 @@ public class MapClickHandler : MonoBehaviour
     public RectTransform mapRect;
     public MapDataManager dataManager;
     public bool placeMode = false;
+    public NodeEditorUI editorUI;
 
     void Update()
     {
@@ -37,6 +38,8 @@ public class MapClickHandler : MonoBehaviour
                 }
 
                 dataManager.AddNode(new Vector2(normalizedX, normalizedY));
+
+                editorUI.OpenEditor(dataManager.mapData.nodes.Count - 1);
 
                 Debug.Log($"Saved node at {normalizedX}, {normalizedY}");
 
