@@ -7,6 +7,7 @@ public class MapController : MonoBehaviour
     public float zoomSpeed = 0.1f;
     public float minScale = 0.5f;
     public float maxScale = 2f;
+    public RectTransform mapRect;
 
     private RectTransform mapRT;
 
@@ -19,6 +20,14 @@ public class MapController : MonoBehaviour
 
     void Update()
     {
+        if (!RectTransformUtility.RectangleContainsScreenPoint(
+        mapRect,
+        Input.mousePosition,
+        null))
+        {
+            return; // mouse not over map
+        }
+
         HandleZoom();
         HandlePan();
     }

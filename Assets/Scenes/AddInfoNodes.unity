@@ -3692,6 +3692,7 @@ MonoBehaviour:
   zoomSpeed: 0.1
   minScale: 1
   maxScale: 3
+  mapRect: {fileID: 863549278}
 --- !u!1 &1719346801
 GameObject:
   m_ObjectHideFlags: 0
