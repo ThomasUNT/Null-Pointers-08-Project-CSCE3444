@@ -6,6 +6,7 @@ public class NodeEditorUI : MonoBehaviour
     public GameObject nodeTextInputPanel;
     public GameObject buttonPanel;
     public TMP_InputField inputField;
+    public MapDataManager dataManager;
 
     private int activeNodeIndex = -1;
 
@@ -23,6 +24,17 @@ public class NodeEditorUI : MonoBehaviour
         // focus cursor automatically
         inputField.ActivateInputField();
         inputField.Select();
+    }
+
+    public void SaveNodeText()
+    {
+        if (activeNodeIndex < 0) return;
+
+        dataManager.mapData.nodes[activeNodeIndex].text = inputField.text;
+
+        dataManager.Save();
+
+        CloseEditor();
     }
 
     public void CloseEditor()
