@@ -27,6 +27,16 @@ public class MapDataManager : MonoBehaviour
         DrawNodes();
     }
 
+    void Update()
+    {
+        // compensate for map scaling live
+        foreach (var icon in spawnedIcons)
+        {
+            icon.transform.localScale = Vector3.one / mapRect.localScale.x;
+        }
+
+    }
+
     public void AddNode(Vector2 position)
     {
         NodeData node = new NodeData(position.x, position.y);
@@ -56,6 +66,10 @@ public class MapDataManager : MonoBehaviour
 
             icon.GetComponent<RectTransform>().anchoredPosition =
                 new Vector2(xPos, yPos);
+
+            // compensate for map scaling
+            float mapScale = mapRect.localScale.x;
+            icon.transform.localScale = Vector3.one / mapScale;
 
             icon.GetComponent<NodeIcon>()
                 .Initialize(i, editorUI);
