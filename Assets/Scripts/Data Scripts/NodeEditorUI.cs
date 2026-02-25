@@ -7,6 +7,8 @@ public class NodeEditorUI : MonoBehaviour
     public GameObject buttonPanel;
     public TMP_InputField inputField;
     public TMP_InputField titleInputField;
+    public TMP_Dropdown typeDropdown;
+    public TMP_Dropdown priorityDropdown;
     public MapDataManager dataManager;
 
     private int activeNodeIndex = -1;
@@ -20,8 +22,15 @@ public class NodeEditorUI : MonoBehaviour
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
 
+        // populate fields with data from json
         inputField.text = dataManager.mapData.nodes[nodeIndex].text;
         titleInputField.text = dataManager.mapData.nodes[nodeIndex].title;
+        priorityDropdown.value = dataManager.mapData.nodes[nodeIndex].priority; 
+
+        int typeIndex = typeDropdown.options.FindIndex(
+            option => option.text == dataManager.mapData.nodes[nodeIndex].type);
+
+        typeDropdown.value = typeIndex >= 0 ? typeIndex : 0;
 
         // focus cursor automatically
         inputField.ActivateInputField();
@@ -34,6 +43,8 @@ public class NodeEditorUI : MonoBehaviour
 
         dataManager.mapData.nodes[activeNodeIndex].text = inputField.text;
         dataManager.mapData.nodes[activeNodeIndex].title = titleInputField.text;
+        dataManager.mapData.nodes[activeNodeIndex].type = typeDropdown.options[typeDropdown.value].text;
+        dataManager.mapData.nodes[activeNodeIndex].priority = priorityDropdown.value;
 
         dataManager.Save();
 
