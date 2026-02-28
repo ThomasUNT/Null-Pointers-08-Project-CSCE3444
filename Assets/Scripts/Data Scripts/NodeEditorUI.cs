@@ -23,17 +23,32 @@ public class NodeEditorUI : MonoBehaviour
         buttonPanel.SetActive(false);
 
         // populate fields with data from json
-        inputField.text = dataManager.mapData.nodes[nodeIndex].text;
-        titleInputField.text = dataManager.mapData.nodes[nodeIndex].title;
-        priorityDropdown.value = dataManager.mapData.nodes[nodeIndex].priority; 
+        NodeData node = dataManager.mapData.nodes[nodeIndex];
+
+        inputField.text = node.text;
+        priorityDropdown.value = node.priority; 
 
         int typeIndex = typeDropdown.options.FindIndex(
-            option => option.text == dataManager.mapData.nodes[nodeIndex].type);
+            option => option.text == node.type);
 
         typeDropdown.value = typeIndex >= 0 ? typeIndex : 0;
 
-        // focus cursor automatically
-        inputField.ActivateInputField();
+        if (!string.IsNullOrEmpty(node.titleTextId))
+        {
+            MapTextData titleData = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
+
+            if (titleData != null)
+            {
+                titleInputField.text = titleData.content;
+            }
+        }
+        else
+        {
+            titleInputField.text = "";
+        }
+
+            // focus cursor automatically
+            inputField.ActivateInputField();
         inputField.Select();
     }
 
@@ -41,10 +56,58 @@ public class NodeEditorUI : MonoBehaviour
     {
         if (activeNodeIndex < 0) return;
 
-        dataManager.mapData.nodes[activeNodeIndex].text = inputField.text;
-        dataManager.mapData.nodes[activeNodeIndex].title = titleInputField.text;
-        dataManager.mapData.nodes[activeNodeIndex].type = typeDropdown.options[typeDropdown.value].text;
-        dataManager.mapData.nodes[activeNodeIndex].priority = priorityDropdown.value;
+        NodeData node = dataManager.mapData.nodes[activeNodeIndex];
+
+        node.text = inputField.text;
+        node.type = typeDropdown.options[typeDropdown.value].text;
+        node.priority = priorityDropdown.value;
+
+        string newTitleText = titleInputField.text;
+
+        // if title text is empty, remove existing title text entry if it exists
+        if (string.IsNullOrEmpty(newTitleText))
+        {
+            if(!string.IsNullOrEmpty(node.titleTextId))
+            {
+                MapTextData existing = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
+
+                if (existing != null) dataManager.mapData.mapTexts.Remove(existing);
+
+                node.titleTextId = "";
+            }
+        }
+        else
+        {
+            // If node already has a title text entry, update it. Otherwise create a new one.
+            if (!string.IsNullOrEmpty(node.titleTextId))
+            {
+                MapTextData existing = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
+                if (existing != null)
+                {
+                    existing.content = newTitleText;
+                    existing.x = node.x;
+                    existing.y = node.y - 20f; // offset text below node icon
+                }
+            }
+            else
+            {
+                // create new title text entry
+                MapTextData newText = new MapTextData();
+                newText.id = System.Guid.NewGuid().ToString();
+                newText.content = newTitleText;
+                newText.x = node.x;
+                newText.y = node.y - 20f; // offset text below node icon
+                newText.fontSize = 14;
+                newText.priority = 0;
+                newText.colorHex = "#FFFFFF";
+                newText.rotation = 0f;
+                newText.arc = 0f;
+
+                dataManager.mapData.mapTexts.Add(newText);
+
+                node.titleTextId = newText.id;
+            }
+        }
 
         dataManager.Save();
 
