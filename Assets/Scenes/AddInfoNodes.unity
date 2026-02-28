@@ -269,8 +269,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapDataManager
   mapData:
     nodes: []
+    mapTexts: []
   mapRect: {fileID: 1598337226}
   nodeIconPrefab: {fileID: 2296013802742988286, guid: f691fcf08bef4374e929675051b68cc2, type: 3}
+  mapTextPrefab: {fileID: 1569003058668544401, guid: 62b7a4fa7f0d931469011fb8acdeec72, type: 3}
   editorUI: {fileID: 263706681}
 --- !u!4 &55223474
 Transform:

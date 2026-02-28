@@ -78,6 +78,11 @@ public class NodeEditorUI : MonoBehaviour
         }
         else
         {
+            // normalize offset
+            Rect rect = dataManager.mapRect.rect;
+
+            float normalizedYOffset = 20f / rect.height;
+
             // If node already has a title text entry, update it. Otherwise create a new one.
             if (!string.IsNullOrEmpty(node.titleTextId))
             {
@@ -86,7 +91,7 @@ public class NodeEditorUI : MonoBehaviour
                 {
                     existing.content = newTitleText;
                     existing.x = node.x;
-                    existing.y = node.y - 20f; // offset text below node icon
+                    existing.y = node.y - normalizedYOffset; // offset text below node icon
                 }
             }
             else
@@ -96,7 +101,7 @@ public class NodeEditorUI : MonoBehaviour
                 newText.id = System.Guid.NewGuid().ToString();
                 newText.content = newTitleText;
                 newText.x = node.x;
-                newText.y = node.y - 20f; // offset text below node icon
+                newText.y = node.y - normalizedYOffset; // offset text below node icon
                 newText.fontSize = 14;
                 newText.priority = 0;
                 newText.colorHex = "#FFFFFF";
@@ -110,6 +115,7 @@ public class NodeEditorUI : MonoBehaviour
         }
 
         dataManager.Save();
+        dataManager.DrawMapTexts();
 
         CloseEditor();
     }
@@ -118,6 +124,15 @@ public class NodeEditorUI : MonoBehaviour
     public void DeleteNode()
     {
         if (activeNodeIndex < 0) return;
+
+        NodeData node = dataManager.mapData.nodes[activeNodeIndex];
+
+        if (!string.IsNullOrEmpty(node.titleTextId))
+        {
+            MapTextData title = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
+            if (title != null)
+                dataManager.mapData.mapTexts.Remove(title);
+        }
 
         dataManager.mapData.nodes.RemoveAt(activeNodeIndex);
         dataManager.Save();
