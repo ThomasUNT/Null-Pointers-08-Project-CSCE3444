@@ -125,6 +125,13 @@ public class MapDataManager : MonoBehaviour
             // Rotation
             textObj.transform.localRotation = Quaternion.Euler(0,0, textData.rotation);
 
+            // Arc
+            CurvedText curved = textObj.GetComponent<CurvedText>();
+            if (curved != null)
+            {
+                curved.UpdateCurve(textData.arc);
+            }
+
             // compensate for map scaling
             float mapScale = mapRect.localScale.x;
             textObj.transform.localScale = Vector3.one / mapScale;
