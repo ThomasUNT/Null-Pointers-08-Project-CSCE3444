@@ -31,7 +31,7 @@ public class MapTextData
     public string content;
 
     public int priority;
-    public int fontSize;
+    public float fontSize;
     public string colorHex;
     public float rotation;
     public float arc;

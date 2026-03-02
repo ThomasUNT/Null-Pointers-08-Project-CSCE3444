@@ -1,17 +1,31 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class NodeEditorUI : MonoBehaviour
 {
-    public GameObject nodeTextInputPanel;
-    public GameObject buttonPanel;
-    public TMP_InputField inputField;
-    public TMP_InputField titleInputField;
-    public TMP_Dropdown typeDropdown;
-    public TMP_Dropdown priorityDropdown;
-    public MapDataManager dataManager;
+    // Panels
+    [SerializeField] private GameObject nodeTextInputPanel;
+    [SerializeField] private GameObject buttonPanel;
+    [SerializeField] private GameObject textEditorPanel;
+
+    // Node Editor Fields
+    [SerializeField] private TMP_InputField inputField;
+    [SerializeField] private TMP_InputField titleInputField;
+    [SerializeField] private TMP_Dropdown typeDropdown;
+    [SerializeField] private TMP_Dropdown priorityDropdown;
+
+    // Text Editor Fields
+    [SerializeField] private TMP_InputField mapTextInputField;
+    [SerializeField] private Slider fontSizeSlider;
+    [SerializeField] private Slider textArcSlider;
+    [SerializeField] private Slider textRotationSlider;
+    [SerializeField] private TMP_Dropdown textPriorityDropdown;
+
+    [SerializeField] private MapDataManager dataManager;
 
     private int activeNodeIndex = -1;
+    private int activeTextIndex = -1;
 
     public void OpenEditor(int nodeIndex)
     {
@@ -21,6 +35,7 @@ public class NodeEditorUI : MonoBehaviour
 
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
+        textEditorPanel.SetActive(false);
 
         // populate fields with data from json
         NodeData node = dataManager.mapData.nodes[nodeIndex];
@@ -50,6 +65,48 @@ public class NodeEditorUI : MonoBehaviour
             // focus cursor automatically
             inputField.ActivateInputField();
         inputField.Select();
+    }
+
+    public void OpenTextEditor(int textIndex)
+    {
+        activeTextIndex = textIndex;
+
+        textEditorPanel.SetActive(true);
+        nodeTextInputPanel.SetActive(false);
+        buttonPanel.SetActive(false);
+
+        MapTextData textData = dataManager.mapData.mapTexts[textIndex];
+
+        // Populate fields
+        mapTextInputField.text = textData.content;
+        fontSizeSlider.value = textData.fontSize;
+        textArcSlider.value = textData.arc;
+        textRotationSlider.value = textData.rotation;
+        textPriorityDropdown.value = textData.priority;
+    }
+
+    public void OpenTitleAppearance()
+    {
+        if (activeNodeIndex < 0) return;
+
+        NodeData node = dataManager.mapData.nodes[activeNodeIndex];
+
+        if (string.IsNullOrEmpty(node.titleTextId))
+        {
+            Debug.LogWarning("Node has no title text assigned.");
+            return;
+        }
+
+        int textIndex = dataManager.mapData.mapTexts
+            .FindIndex(t => t.id == node.titleTextId);
+
+        if (textIndex < 0)
+        {
+            Debug.LogWarning("Title text not found in mapTexts.");
+            return;
+        }
+
+        OpenTextEditor(textIndex);
     }
 
     public void SaveNodeText()
@@ -121,6 +178,34 @@ public class NodeEditorUI : MonoBehaviour
     }
 
 
+    public void SaveTextEditor()
+    {
+        if (activeTextIndex < 0) return;
+
+        MapTextData textData = dataManager.mapData.mapTexts[activeTextIndex];
+
+        // Update content
+        textData.content = mapTextInputField.text;
+
+        // Update priority
+        textData.priority = textPriorityDropdown.value;
+
+        // Update sliders
+        textData.fontSize = fontSizeSlider.value;
+        textData.arc = textArcSlider.value;
+        textData.rotation = textRotationSlider.value;
+
+        // Save data
+        dataManager.Save();
+
+        // Redraw map texts to reflect changes
+        dataManager.DrawMapTexts();
+
+        // Close text editor
+        CloseTextEditor();
+    }
+
+
     public void DeleteNode()
     {
         if (activeNodeIndex < 0) return;
@@ -147,6 +232,13 @@ public class NodeEditorUI : MonoBehaviour
         nodeTextInputPanel.SetActive(false);
         buttonPanel.SetActive(true);
         activeNodeIndex = -1;
+    }
+
+    public void CloseTextEditor()
+    {
+        textEditorPanel.SetActive(false);
+        buttonPanel.SetActive(true);
+        activeTextIndex = -1;
     }
 
     public string GetText()
