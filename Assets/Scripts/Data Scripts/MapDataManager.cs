@@ -9,9 +9,11 @@ public class MapDataManager : MonoBehaviour
     private string filePath;
     public RectTransform mapRect;
     public GameObject nodeIconPrefab;
+    public GameObject mapTextPrefab;
     public NodeEditorUI editorUI;
 
     List<GameObject> spawnedIcons = new List<GameObject>();
+    List<GameObject> spawnedTexts = new List<GameObject>();
 
     void Start()
     {
@@ -34,6 +36,7 @@ public class MapDataManager : MonoBehaviour
     {
         yield return null; // wait 1 frame
         DrawNodes();
+        DrawMapTexts();
     }
 
     void Update()
@@ -44,6 +47,10 @@ public class MapDataManager : MonoBehaviour
             icon.transform.localScale = Vector3.one / mapRect.localScale.x;
         }
 
+        foreach (var text in spawnedTexts)
+        {
+            text.transform.localScale = Vector3.one / mapRect.localScale.x;
+        }
     }
 
     public void AddNode(Vector2 position)
@@ -84,6 +91,52 @@ public class MapDataManager : MonoBehaviour
                 .Initialize(i, editorUI);
 
             spawnedIcons.Add(icon);
+        }
+        DrawMapTexts();
+    }
+
+    public void DrawMapTexts()
+    {
+        // clear old texts
+        foreach (var textObj in spawnedTexts)
+            Destroy(textObj);
+        
+        spawnedTexts.Clear();
+
+        Rect rect = mapRect.rect;
+
+        for (int i = 0; i < mapData.mapTexts.Count; i++)
+        {
+            var textData = mapData.mapTexts[i];
+
+            GameObject textObj = Instantiate(mapTextPrefab, mapRect);
+
+            float xPos = rect.x + textData.x * rect.width;
+            float yPos = rect.y + textData.y * rect.height;
+
+            textObj.GetComponent<RectTransform>().anchoredPosition =
+                new Vector2(xPos, yPos);
+
+            // Pull text
+            TMPro.TMP_Text tmp = textObj.GetComponent<TMPro.TMP_Text>();
+            tmp.text = textData.content;
+            tmp.fontSize = textData.fontSize;
+
+            // Rotation
+            textObj.transform.localRotation = Quaternion.Euler(0,0, textData.rotation);
+
+            // Arc
+            CurvedText curved = textObj.GetComponent<CurvedText>();
+            if (curved != null)
+            {
+                curved.UpdateCurve(textData.arc);
+            }
+
+            // compensate for map scaling
+            float mapScale = mapRect.localScale.x;
+            textObj.transform.localScale = Vector3.one / mapScale;
+
+            spawnedTexts.Add(textObj);
         }
     }
 

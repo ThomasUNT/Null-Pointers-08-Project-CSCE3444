@@ -4,4 +4,5 @@ using System.Collections.Generic;
 public class MapData
 {
     public List<NodeData> nodes = new List<NodeData>();
+    public List<MapTextData> mapTexts = new List<MapTextData>();
 }
