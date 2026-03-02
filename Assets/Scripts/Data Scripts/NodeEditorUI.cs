@@ -27,6 +27,9 @@ public class NodeEditorUI : MonoBehaviour
     private int activeNodeIndex = -1;
     private int activeTextIndex = -1;
 
+
+    // ------------------------------ Node Editor Methods ---------------------------------
+
     public void OpenEditor(int nodeIndex)
     {
         activeNodeIndex = nodeIndex;
@@ -67,48 +70,6 @@ public class NodeEditorUI : MonoBehaviour
         inputField.Select();
     }
 
-    public void OpenTextEditor(int textIndex)
-    {
-        activeTextIndex = textIndex;
-
-        textEditorPanel.SetActive(true);
-        nodeTextInputPanel.SetActive(false);
-        buttonPanel.SetActive(false);
-
-        MapTextData textData = dataManager.mapData.mapTexts[textIndex];
-
-        // Populate fields
-        mapTextInputField.text = textData.content;
-        fontSizeSlider.value = textData.fontSize;
-        textArcSlider.value = textData.arc;
-        textRotationSlider.value = textData.rotation;
-        textPriorityDropdown.value = textData.priority;
-    }
-
-    public void OpenTitleAppearance()
-    {
-        if (activeNodeIndex < 0) return;
-
-        NodeData node = dataManager.mapData.nodes[activeNodeIndex];
-
-        if (string.IsNullOrEmpty(node.titleTextId))
-        {
-            Debug.LogWarning("Node has no title text assigned.");
-            return;
-        }
-
-        int textIndex = dataManager.mapData.mapTexts
-            .FindIndex(t => t.id == node.titleTextId);
-
-        if (textIndex < 0)
-        {
-            Debug.LogWarning("Title text not found in mapTexts.");
-            return;
-        }
-
-        OpenTextEditor(textIndex);
-    }
-
     public void SaveNodeText()
     {
         if (activeNodeIndex < 0) return;
@@ -124,7 +85,7 @@ public class NodeEditorUI : MonoBehaviour
         // if title text is empty, remove existing title text entry if it exists
         if (string.IsNullOrEmpty(newTitleText))
         {
-            if(!string.IsNullOrEmpty(node.titleTextId))
+            if (!string.IsNullOrEmpty(node.titleTextId))
             {
                 MapTextData existing = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
 
@@ -177,35 +138,6 @@ public class NodeEditorUI : MonoBehaviour
         CloseEditor();
     }
 
-
-    public void SaveTextEditor()
-    {
-        if (activeTextIndex < 0) return;
-
-        MapTextData textData = dataManager.mapData.mapTexts[activeTextIndex];
-
-        // Update content
-        textData.content = mapTextInputField.text;
-
-        // Update priority
-        textData.priority = textPriorityDropdown.value;
-
-        // Update sliders
-        textData.fontSize = fontSizeSlider.value;
-        textData.arc = textArcSlider.value;
-        textData.rotation = textRotationSlider.value;
-
-        // Save data
-        dataManager.Save();
-
-        // Redraw map texts to reflect changes
-        dataManager.DrawMapTexts();
-
-        // Close text editor
-        CloseTextEditor();
-    }
-
-
     public void DeleteNode()
     {
         if (activeNodeIndex < 0) return;
@@ -226,13 +158,86 @@ public class NodeEditorUI : MonoBehaviour
         CloseEditor();
     }
 
-
     public void CloseEditor()
     {
         nodeTextInputPanel.SetActive(false);
         buttonPanel.SetActive(true);
         activeNodeIndex = -1;
     }
+
+
+    // ------------------------------ Text Editor Methods ---------------------------------
+
+
+    public void OpenTitleAppearance()
+    {
+        if (activeNodeIndex < 0) return;
+
+        NodeData node = dataManager.mapData.nodes[activeNodeIndex];
+
+        // if node has no title text assigned, we can't open the editor
+        if (string.IsNullOrEmpty(node.titleTextId))
+        {
+            Debug.LogWarning("Node has no title text assigned.");
+            return;
+        }
+
+        // text lookup by id
+        int textIndex = dataManager.mapData.mapTexts
+            .FindIndex(t => t.id == node.titleTextId);
+
+        if (textIndex < 0)
+        {
+            Debug.LogWarning("Title text not found in mapTexts.");
+            return;
+        }
+
+        OpenTextEditor(textIndex);
+    }
+
+
+    public void OpenTextEditor(int textIndex)
+    {
+        activeTextIndex = textIndex;
+
+        // Change Panels
+        textEditorPanel.SetActive(true);
+        nodeTextInputPanel.SetActive(false);
+        buttonPanel.SetActive(false);
+
+        MapTextData textData = dataManager.mapData.mapTexts[textIndex];
+
+        // Populate fields
+        mapTextInputField.text = textData.content;
+        fontSizeSlider.value = textData.fontSize;
+        textArcSlider.value = textData.arc;
+        textRotationSlider.value = textData.rotation;
+        textPriorityDropdown.value = textData.priority;
+    }
+
+
+    public void SaveTextEditor()
+    {
+        if (activeTextIndex < 0) return;
+
+        MapTextData textData = dataManager.mapData.mapTexts[activeTextIndex];
+
+        // save changes to text data
+        textData.content = mapTextInputField.text;
+        textData.priority = textPriorityDropdown.value;
+        textData.fontSize = fontSizeSlider.value;
+        textData.arc = textArcSlider.value;
+        textData.rotation = textRotationSlider.value;
+
+        // Save data
+        dataManager.Save();
+
+        // Redraw map texts to reflect changes
+        dataManager.DrawMapTexts();
+
+        CloseTextEditor();
+    }
+
 
     public void CloseTextEditor()
     {
