@@ -3,6 +3,7 @@ public class NodeData
 {
     public float x;
     public float y;
+    public float size;
     public string text;
     public string titleTextId;
     public int priority;
@@ -12,6 +13,7 @@ public class NodeData
     {
         this.x = x;
         this.y = y;
+        this.size = 1.0f;
         this.text = "";
 
         // reference to MapTextData entry for the title text of the node

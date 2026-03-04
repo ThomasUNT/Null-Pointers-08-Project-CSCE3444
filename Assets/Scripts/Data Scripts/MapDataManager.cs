@@ -11,6 +11,7 @@ public class MapDataManager : MonoBehaviour
     public GameObject nodeIconPrefab;
     public GameObject mapTextPrefab;
     public NodeEditorUI editorUI;
+    public int defaultNodeSizeMultiplier = 1;
 
     [Header("Node Type Sprites")]
     public Sprite ruinsSprite;
@@ -51,9 +52,15 @@ public class MapDataManager : MonoBehaviour
     void Update()
     {
         // compensate for map scaling live
-        foreach (var icon in spawnedIcons)
+        float mapScale = mapRect.localScale.x;
+
+        for (int i = 0; i < spawnedIcons.Count; i++)
         {
-            icon.transform.localScale = Vector3.one / mapRect.localScale.x;
+            var node = mapData.nodes[i];
+
+            float finalScale = (defaultNodeSizeMultiplier * node.size) / mapScale;
+
+            spawnedIcons[i].transform.localScale = Vector3.one * finalScale;
         }
 
         foreach (var text in spawnedTexts)
@@ -110,7 +117,9 @@ public class MapDataManager : MonoBehaviour
 
             // compensate for map scaling
             float mapScale = mapRect.localScale.x;
-            icon.transform.localScale = Vector3.one / mapScale;
+
+            float finalScale = (defaultNodeSizeMultiplier * node.size) / mapScale;
+            icon.transform.localScale = Vector3.one * finalScale;
 
             icon.GetComponent<NodeIcon>()
                 .Initialize(i, editorUI);

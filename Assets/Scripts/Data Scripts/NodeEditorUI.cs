@@ -5,17 +5,21 @@ using TMPro;
 public class NodeEditorUI : MonoBehaviour
 {
     // Panels
+    [Header("Panels")]
     [SerializeField] private GameObject nodeTextInputPanel;
     [SerializeField] private GameObject buttonPanel;
     [SerializeField] private GameObject textEditorPanel;
 
     // Node Editor Fields
+    [Header("Node Editor Fields")]
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_InputField titleInputField;
     [SerializeField] private TMP_Dropdown typeDropdown;
     [SerializeField] private TMP_Dropdown priorityDropdown;
+    [SerializeField] private Slider nodeSizeSlider;
 
     // Text Editor Fields
+    [Header("Text Editor Fields")]
     [SerializeField] private TMP_InputField mapTextInputField;
     [SerializeField] private Slider fontSizeSlider;
     [SerializeField] private Slider textArcSlider;
@@ -45,6 +49,7 @@ public class NodeEditorUI : MonoBehaviour
 
         inputField.text = node.text;
         priorityDropdown.value = node.priority; 
+        nodeSizeSlider.value = node.size;
 
         int typeIndex = typeDropdown.options.FindIndex(
             option => option.text == node.type);
@@ -79,6 +84,7 @@ public class NodeEditorUI : MonoBehaviour
         node.text = inputField.text;
         node.type = typeDropdown.options[typeDropdown.value].text;
         node.priority = priorityDropdown.value;
+        node.size = nodeSizeSlider.value;
 
         string newTitleText = titleInputField.text;
 
