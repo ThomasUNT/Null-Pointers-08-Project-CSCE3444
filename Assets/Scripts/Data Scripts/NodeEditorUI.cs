@@ -133,6 +133,7 @@ public class NodeEditorUI : MonoBehaviour
         }
 
         dataManager.Save();
+        dataManager.DrawNodes();
         dataManager.DrawMapTexts();
 
         CloseEditor();

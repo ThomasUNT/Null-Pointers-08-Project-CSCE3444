@@ -12,6 +12,15 @@ public class MapDataManager : MonoBehaviour
     public GameObject mapTextPrefab;
     public NodeEditorUI editorUI;
 
+    [Header("Node Type Sprites")]
+    public Sprite ruinsSprite;
+    public Sprite villageSprite;
+    public Sprite townSprite;
+    public Sprite citySprite;
+    public Sprite majorCitySprite;
+    public Sprite defaultSprite;
+
+
     List<GameObject> spawnedIcons = new List<GameObject>();
     List<GameObject> spawnedTexts = new List<GameObject>();
 
@@ -61,6 +70,19 @@ public class MapDataManager : MonoBehaviour
         DrawNodes();
     }
 
+    private Sprite GetSpriteForType(string type)
+    {
+        switch (type)
+        {
+            case "Ruins": return ruinsSprite;
+            case "Village": return villageSprite;
+            case "Town": return townSprite;
+            case "City": return citySprite;
+            case "Major City": return majorCitySprite;
+            default: return defaultSprite; ;
+        }
+    }
+
     public void DrawNodes()
     {
         // clear old icons
@@ -82,6 +104,9 @@ public class MapDataManager : MonoBehaviour
 
             icon.GetComponent<RectTransform>().anchoredPosition =
                 new Vector2(xPos, yPos);
+
+            UnityEngine.UI.Image image = icon.GetComponent<UnityEngine.UI.Image>();
+            image.sprite = GetSpriteForType(node.type);
 
             // compensate for map scaling
             float mapScale = mapRect.localScale.x;
