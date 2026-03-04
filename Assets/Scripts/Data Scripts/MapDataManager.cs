@@ -79,8 +79,8 @@ public class MapDataManager : MonoBehaviour
                 nodeSize = attachedNode.size;
 
             // Scale offsets dynamically: offsets grow with node size and inversely with map scale
-            float scaledXOffset = textData.xOffset * (nodeSize * 0.8f) / mapScale;
-            float scaledYOffset = textData.yOffset * (nodeSize * 0.8f) / mapScale;
+            float scaledXOffset = textData.xOffset * (nodeSize * 0.7f) / mapScale;
+            float scaledYOffset = textData.yOffset * (nodeSize * 0.7f) / mapScale;
 
             // Convert to pixel coordinates
             Rect rect = mapRect.rect;

@@ -24,6 +24,8 @@ public class NodeEditorUI : MonoBehaviour
     [SerializeField] private Slider fontSizeSlider;
     [SerializeField] private Slider textArcSlider;
     [SerializeField] private Slider textRotationSlider;
+    [SerializeField] private Slider xOffsetSlider;
+    [SerializeField] private Slider yOffsetSlider;
     [SerializeField] private TMP_Dropdown textPriorityDropdown;
 
     [SerializeField] private MapDataManager dataManager;
@@ -223,6 +225,8 @@ public class NodeEditorUI : MonoBehaviour
         fontSizeSlider.value = textData.fontSize;
         textArcSlider.value = textData.arc;
         textRotationSlider.value = textData.rotation;
+        xOffsetSlider.value = textData.xOffset;
+        yOffsetSlider.value = textData.yOffset;
         textPriorityDropdown.value = textData.priority;
     }
 
@@ -239,6 +243,8 @@ public class NodeEditorUI : MonoBehaviour
         textData.fontSize = fontSizeSlider.value;
         textData.arc = textArcSlider.value;
         textData.rotation = textRotationSlider.value;
+        textData.xOffset = xOffsetSlider.value;
+        textData.yOffset = yOffsetSlider.value;
 
         // Save data
         dataManager.Save();
