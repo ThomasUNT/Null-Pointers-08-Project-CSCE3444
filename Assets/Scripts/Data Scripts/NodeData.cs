@@ -30,6 +30,8 @@ public class MapTextData
     public string id;
     public float x;
     public float y;
+    public float yOffset;
+    public float xOffset;
     public string content;
 
     public int priority;

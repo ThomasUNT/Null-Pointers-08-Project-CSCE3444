@@ -63,9 +63,34 @@ public class MapDataManager : MonoBehaviour
             spawnedIcons[i].transform.localScale = Vector3.one * finalScale;
         }
 
-        foreach (var text in spawnedTexts)
+        for (int i = 0; i < spawnedTexts.Count; i++)
         {
-            text.transform.localScale = Vector3.one / mapRect.localScale.x;
+            var textObj = spawnedTexts[i];
+            var textData = mapData.mapTexts[i];
+
+            // Base normalized position
+            float baseX = textData.x;
+            float baseY = textData.y;
+
+            // Node size if this text is attached to a node
+            float nodeSize = 1f;
+            NodeData attachedNode = mapData.nodes.Find(n => n.titleTextId == textData.id);
+            if (attachedNode != null)
+                nodeSize = attachedNode.size;
+
+            // Scale offsets dynamically: offsets grow with node size and inversely with map scale
+            float scaledXOffset = textData.xOffset * (nodeSize * 0.8f) / mapScale;
+            float scaledYOffset = textData.yOffset * (nodeSize * 0.8f) / mapScale;
+
+            // Convert to pixel coordinates
+            Rect rect = mapRect.rect;
+            float xPos = rect.x + (baseX * rect.width) + (scaledXOffset * rect.width);
+            float yPos = rect.y + (baseY * rect.height) + (scaledYOffset * rect.height);
+
+            textObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(xPos, yPos);
+
+            // Keep text visually consistent while zooming
+            textObj.transform.localScale = Vector3.one / mapScale;
         }
     }
 
@@ -145,11 +170,28 @@ public class MapDataManager : MonoBehaviour
 
             GameObject textObj = Instantiate(mapTextPrefab, mapRect);
 
-            float xPos = rect.x + textData.x * rect.width;
-            float yPos = rect.y + textData.y * rect.height;
+            // Get normalized base position
+            float finalNormalizedX = textData.x;
+            float finalNormalizedY = textData.y;
 
-            textObj.GetComponent<RectTransform>().anchoredPosition =
-                new Vector2(xPos, yPos);
+            // Adjust offsets based on node size and map zoom
+            float mapScale = mapRect.localScale.x; // <1 = zoomed out, icons bigger
+            float nodeSize = 1f;
+
+            // If this text is attached to a node, get its size
+            NodeData attachedNode = mapData.nodes.Find(n => n.titleTextId == textData.id);
+            if (attachedNode != null)
+                nodeSize = attachedNode.size;
+
+            // Multiply offsets by node size and by inverse of map scale
+            float scaledXOffset = textData.xOffset * nodeSize / mapScale;
+            float scaledYOffset = textData.yOffset * nodeSize / mapScale;
+
+            // Convert to pixel space
+            float xPos = rect.x + (finalNormalizedX * rect.width) + (scaledXOffset * rect.width);
+            float yPos = rect.y + (finalNormalizedY * rect.height) + (scaledYOffset * rect.height);
+
+            textObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(xPos, yPos);
 
             // Pull text
             TMPro.TMP_Text tmp = textObj.GetComponent<TMPro.TMP_Text>();
@@ -167,7 +209,6 @@ public class MapDataManager : MonoBehaviour
             }
 
             // compensate for map scaling
-            float mapScale = mapRect.localScale.x;
             textObj.transform.localScale = Vector3.one / mapScale;
 
             spawnedTexts.Add(textObj);

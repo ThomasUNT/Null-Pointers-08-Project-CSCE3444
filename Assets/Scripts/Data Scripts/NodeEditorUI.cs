@@ -115,7 +115,9 @@ public class NodeEditorUI : MonoBehaviour
                 {
                     existing.content = newTitleText;
                     existing.x = node.x;
-                    existing.y = node.y - normalizedYOffset; // offset text below node icon
+                    existing.y = node.y;
+                    existing.yOffset = -normalizedYOffset; // Store default offset
+                    existing.xOffset = 0f;
                 }
             }
             else
@@ -125,7 +127,9 @@ public class NodeEditorUI : MonoBehaviour
                 newText.id = System.Guid.NewGuid().ToString();
                 newText.content = newTitleText;
                 newText.x = node.x;
-                newText.y = node.y - normalizedYOffset; // offset text below node icon
+                newText.y = node.y;
+                newText.yOffset = -normalizedYOffset; //Store default offset
+                newText.xOffset = 0f;
                 newText.fontSize = 14;
                 newText.priority = 0;
                 newText.colorHex = "#FFFFFF";
