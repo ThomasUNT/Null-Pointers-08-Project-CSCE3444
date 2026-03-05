@@ -118,8 +118,8 @@ public class NodeEditorUI : MonoBehaviour
                     existing.content = newTitleText;
                     existing.x = node.x;
                     existing.y = node.y;
-                    existing.yOffset = -normalizedYOffset; // Store default offset
-                    existing.xOffset = 0f;
+                    //existing.yOffset = -normalizedYOffset; // Store default offset
+                    //existing.xOffset = 0f;
                 }
             }
             else
