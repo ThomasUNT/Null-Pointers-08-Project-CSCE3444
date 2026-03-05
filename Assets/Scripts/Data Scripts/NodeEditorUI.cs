@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.UIElements;
 
 public class NodeEditorUI : MonoBehaviour
 {
@@ -17,17 +18,26 @@ public class NodeEditorUI : MonoBehaviour
     [SerializeField] private TMP_InputField titleInputField;
     [SerializeField] private TMP_Dropdown typeDropdown;
     [SerializeField] private TMP_Dropdown priorityDropdown;
-    [SerializeField] private Slider nodeSizeSlider;
+    [SerializeField] private UnityEngine.UI.Slider nodeSizeSlider;
+
+    // Title Editor Fields
+    [Header("Title Editor Fields")]
+    [SerializeField] private TMP_InputField titleEditorInputField;
+    [SerializeField] private UnityEngine.UI.Slider titleFontSizeSlider;
+    [SerializeField] private UnityEngine.UI.Slider titleArcSlider;
+    [SerializeField] private UnityEngine.UI.Slider titleRotationSlider;
+    [SerializeField] private UnityEngine.UI.Slider titleXOffsetSlider;
+    [SerializeField] private UnityEngine.UI.Slider titleYOffsetSlider;
+    [SerializeField] private TMP_Dropdown titlePriorityDropdown;
 
     // Text Editor Fields
-    [Header("Text Editor Fields")]
+    [Header("Text Editor Panels")]
     [SerializeField] private TMP_InputField mapTextInputField;
-    [SerializeField] private Slider fontSizeSlider;
-    [SerializeField] private Slider textArcSlider;
-    [SerializeField] private Slider textRotationSlider;
-    [SerializeField] private Slider xOffsetSlider;
-    [SerializeField] private Slider yOffsetSlider;
+    [SerializeField] private UnityEngine.UI.Slider textFontSizeSlider;
+    [SerializeField] private UnityEngine.UI.Slider textArcSlider;
+    [SerializeField] private UnityEngine.UI.Slider textRotationSlider;
     [SerializeField] private TMP_Dropdown textPriorityDropdown;
+
 
     [SerializeField] private MapDataManager dataManager;
 
@@ -223,12 +233,12 @@ public class NodeEditorUI : MonoBehaviour
 
         // Populate fields
         mapTextInputField.text = textData.content;
-        fontSizeSlider.value = textData.fontSize;
-        textArcSlider.value = textData.arc;
-        textRotationSlider.value = textData.rotation;
-        xOffsetSlider.value = textData.xOffset;
-        yOffsetSlider.value = textData.yOffset;
-        textPriorityDropdown.value = textData.priority;
+        titleFontSizeSlider.value = textData.fontSize;
+        titleArcSlider.value = textData.arc;
+        titleRotationSlider.value = textData.rotation;
+        titleXOffsetSlider.value = textData.xOffset;
+        titleYOffsetSlider.value = textData.yOffset;
+        titlePriorityDropdown.value = textData.priority;
     }
 
 
@@ -240,12 +250,12 @@ public class NodeEditorUI : MonoBehaviour
 
         // save changes to text data
         textData.content = mapTextInputField.text;
-        textData.priority = textPriorityDropdown.value;
-        textData.fontSize = fontSizeSlider.value;
-        textData.arc = textArcSlider.value;
-        textData.rotation = textRotationSlider.value;
-        textData.xOffset = xOffsetSlider.value;
-        textData.yOffset = yOffsetSlider.value;
+        textData.priority = titlePriorityDropdown.value;
+        textData.fontSize = titleFontSizeSlider.value;
+        textData.arc = titleArcSlider.value;
+        textData.rotation = titleRotationSlider.value;
+        textData.xOffset = titleXOffsetSlider.value;
+        textData.yOffset = titleYOffsetSlider.value;
 
         // Save data
         dataManager.Save();
