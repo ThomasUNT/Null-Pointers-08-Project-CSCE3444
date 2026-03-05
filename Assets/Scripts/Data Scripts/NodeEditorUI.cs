@@ -8,7 +8,8 @@ public class NodeEditorUI : MonoBehaviour
     [Header("Panels")]
     [SerializeField] private GameObject nodeTextInputPanel;
     [SerializeField] private GameObject buttonPanel;
-    [SerializeField] private GameObject textEditorPanel;
+    [SerializeField] private GameObject titleEditorPanel;
+    [SerializeField] private GameObject mapTextEditorPanel;
 
     // Node Editor Fields
     [Header("Node Editor Fields")]
@@ -44,7 +45,7 @@ public class NodeEditorUI : MonoBehaviour
 
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
-        textEditorPanel.SetActive(false);
+        titleEditorPanel.SetActive(false);
 
         // populate fields with data from json
         NodeData node = dataManager.mapData.nodes[nodeIndex];
@@ -214,7 +215,7 @@ public class NodeEditorUI : MonoBehaviour
         activeTextIndex = textIndex;
 
         // Change Panels
-        textEditorPanel.SetActive(true);
+        titleEditorPanel.SetActive(true);
         nodeTextInputPanel.SetActive(false);
         buttonPanel.SetActive(false);
 
@@ -258,7 +259,7 @@ public class NodeEditorUI : MonoBehaviour
 
     public void CloseTextEditor()
     {
-        textEditorPanel.SetActive(false);
+        titleEditorPanel.SetActive(false);
         buttonPanel.SetActive(true);
         activeTextIndex = -1;
     }
