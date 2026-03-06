@@ -21,3 +21,4 @@ Recordings/
 *.mdb
 *.opendb
 *.VC.db
+*.vsidx
