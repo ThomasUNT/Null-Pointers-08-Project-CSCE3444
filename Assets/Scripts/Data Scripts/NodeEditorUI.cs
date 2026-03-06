@@ -61,7 +61,7 @@ public class NodeEditorUI : MonoBehaviour
         NodeData node = dataManager.mapData.nodes[nodeIndex];
 
         inputField.text = node.text;
-        priorityDropdown.value = node.priority; 
+        priorityDropdown.value = node.priority;
         nodeSizeSlider.value = node.size;
 
         int typeIndex = typeDropdown.options.FindIndex(
@@ -83,8 +83,8 @@ public class NodeEditorUI : MonoBehaviour
             titleInputField.text = "";
         }
 
-            // focus cursor automatically
-            inputField.ActivateInputField();
+        // focus cursor automatically
+        inputField.ActivateInputField();
         inputField.Select();
     }
 
@@ -190,7 +190,7 @@ public class NodeEditorUI : MonoBehaviour
     }
 
 
-    // ------------------------------ Text Editor Methods ---------------------------------
+    // ------------------------------ Title Editor Methods ---------------------------------
 
 
     public void OpenTitleAppearance()
@@ -216,11 +216,11 @@ public class NodeEditorUI : MonoBehaviour
             return;
         }
 
-        OpenTextEditor(textIndex);
+        OpenTitleEditor(textIndex);
     }
 
 
-    public void OpenTextEditor(int textIndex)
+    public void OpenTitleEditor(int textIndex)
     {
         activeTextIndex = textIndex;
 
@@ -232,7 +232,7 @@ public class NodeEditorUI : MonoBehaviour
         MapTextData textData = dataManager.mapData.mapTexts[textIndex];
 
         // Populate fields
-        mapTextInputField.text = textData.content;
+        titleEditorInputField.text = textData.content;
         titleFontSizeSlider.value = textData.fontSize;
         titleArcSlider.value = textData.arc;
         titleRotationSlider.value = textData.rotation;
@@ -242,14 +242,14 @@ public class NodeEditorUI : MonoBehaviour
     }
 
 
-    public void SaveTextEditor()
+    public void saveTitleEditor()
     {
         if (activeTextIndex < 0) return;
 
         MapTextData textData = dataManager.mapData.mapTexts[activeTextIndex];
 
         // save changes to text data
-        textData.content = mapTextInputField.text;
+        textData.content = titleEditorInputField.text;
         textData.priority = titlePriorityDropdown.value;
         textData.fontSize = titleFontSizeSlider.value;
         textData.arc = titleArcSlider.value;
@@ -263,11 +263,11 @@ public class NodeEditorUI : MonoBehaviour
         // Redraw map texts to reflect changes
         dataManager.DrawMapTexts();
 
-        CloseTextEditor();
+        CloseTitleEditor();
     }
 
 
-    public void CloseTextEditor()
+    public void CloseTitleEditor()
     {
         titleEditorPanel.SetActive(false);
         buttonPanel.SetActive(true);
@@ -278,4 +278,58 @@ public class NodeEditorUI : MonoBehaviour
     {
         return inputField.text;
     }
+
+
+    // ------------------------------ Text Editor Methods ---------------------------------
+
+    public void OpenTextEditor(int textIndex)
+    {
+        activeTextIndex = textIndex;
+
+        // Change Panels
+        mapTextEditorPanel.SetActive(true);
+        nodeTextInputPanel.SetActive(false);
+        buttonPanel.SetActive(false);
+        titleEditorPanel.SetActive(false);
+
+        MapTextData textData = dataManager.mapData.mapTexts[textIndex];
+
+        // Populate fields
+        mapTextInputField.text = textData.content;
+        textFontSizeSlider.value = textData.fontSize;
+        textArcSlider.value = textData.arc;
+        textRotationSlider.value = textData.rotation;
+        textPriorityDropdown.value = textData.priority;
+    }
+
+    public void saveTextEditor()
+    {
+        if (activeTextIndex < 0) return;
+
+        MapTextData textData = dataManager.mapData.mapTexts[activeTextIndex];
+
+        // save changes to text data
+        textData.content = mapTextInputField.text;
+        textData.priority = textPriorityDropdown.value;
+        textData.fontSize = textFontSizeSlider.value;
+        textData.arc = textArcSlider.value;
+        textData.rotation = textRotationSlider.value;
+
+
+        // Save data
+        dataManager.Save();
+
+        // Redraw map texts to reflect changes
+        dataManager.DrawMapTexts();
+
+        CloseTextEditor();
+    }
+
+    public void CloseTextEditor()
+    {
+        mapTextEditorPanel.SetActive(false);
+        buttonPanel.SetActive(true);
+        activeTextIndex = -1;
+    }
+
 }
