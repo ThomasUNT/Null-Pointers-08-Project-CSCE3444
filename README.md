@@ -2,7 +2,7 @@
 Shared repository for group 8, CSCE 3444 section 003
 Team 8- Null pointers
 
-Scrum Meetings: Mondays, 4:00 p.m. - 5:00 p.m.
+Scrum Meetings: Mondays, 11:30 a.m. - 12:30 p.m.
 
 IMM is a unity-based tool that allows users to create or upload maps, add world-building info and use them interactively during sessions
 Thomas Delange-Project Manager
