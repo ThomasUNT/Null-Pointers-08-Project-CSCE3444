@@ -38,7 +38,6 @@ public class NodeEditorUI : MonoBehaviour
     [SerializeField] private UnityEngine.UI.Slider textRotationSlider;
     [SerializeField] private TMP_Dropdown textPriorityDropdown;
 
-
     [SerializeField] private MapDataManager dataManager;
 
     private int activeNodeIndex = -1;
@@ -129,8 +128,6 @@ public class NodeEditorUI : MonoBehaviour
                     existing.content = newTitleText;
                     existing.x = node.x;
                     existing.y = node.y;
-                    //existing.yOffset = -normalizedYOffset; // Store default offset
-                    //existing.xOffset = 0f;
                 }
             }
             else
