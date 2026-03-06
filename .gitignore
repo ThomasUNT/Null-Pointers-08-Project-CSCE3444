@@ -22,3 +22,4 @@ Recordings/
 *.opendb
 *.VC.db
 *.vsidx
+/.vs

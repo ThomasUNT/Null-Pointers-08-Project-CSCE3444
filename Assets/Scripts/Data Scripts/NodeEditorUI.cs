@@ -1,25 +1,41 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.UIElements;
 
 public class NodeEditorUI : MonoBehaviour
 {
     // Panels
+    [Header("Panels")]
     [SerializeField] private GameObject nodeTextInputPanel;
     [SerializeField] private GameObject buttonPanel;
-    [SerializeField] private GameObject textEditorPanel;
+    [SerializeField] private GameObject titleEditorPanel;
+    [SerializeField] private GameObject mapTextEditorPanel;
 
     // Node Editor Fields
+    [Header("Node Editor Fields")]
     [SerializeField] private TMP_InputField inputField;
     [SerializeField] private TMP_InputField titleInputField;
     [SerializeField] private TMP_Dropdown typeDropdown;
     [SerializeField] private TMP_Dropdown priorityDropdown;
+    [SerializeField] private UnityEngine.UI.Slider nodeSizeSlider;
+
+    // Title Editor Fields
+    [Header("Title Editor Fields")]
+    [SerializeField] private TMP_InputField titleEditorInputField;
+    [SerializeField] private UnityEngine.UI.Slider titleFontSizeSlider;
+    [SerializeField] private UnityEngine.UI.Slider titleArcSlider;
+    [SerializeField] private UnityEngine.UI.Slider titleRotationSlider;
+    [SerializeField] private UnityEngine.UI.Slider titleXOffsetSlider;
+    [SerializeField] private UnityEngine.UI.Slider titleYOffsetSlider;
+    [SerializeField] private TMP_Dropdown titlePriorityDropdown;
 
     // Text Editor Fields
+    [Header("Text Editor Panels")]
     [SerializeField] private TMP_InputField mapTextInputField;
-    [SerializeField] private Slider fontSizeSlider;
-    [SerializeField] private Slider textArcSlider;
-    [SerializeField] private Slider textRotationSlider;
+    [SerializeField] private UnityEngine.UI.Slider textFontSizeSlider;
+    [SerializeField] private UnityEngine.UI.Slider textArcSlider;
+    [SerializeField] private UnityEngine.UI.Slider textRotationSlider;
     [SerializeField] private TMP_Dropdown textPriorityDropdown;
 
     [SerializeField] private MapDataManager dataManager;
@@ -38,13 +54,14 @@ public class NodeEditorUI : MonoBehaviour
 
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
-        textEditorPanel.SetActive(false);
+        titleEditorPanel.SetActive(false);
 
         // populate fields with data from json
         NodeData node = dataManager.mapData.nodes[nodeIndex];
 
         inputField.text = node.text;
-        priorityDropdown.value = node.priority; 
+        priorityDropdown.value = node.priority;
+        nodeSizeSlider.value = node.size;
 
         int typeIndex = typeDropdown.options.FindIndex(
             option => option.text == node.type);
@@ -65,8 +82,8 @@ public class NodeEditorUI : MonoBehaviour
             titleInputField.text = "";
         }
 
-            // focus cursor automatically
-            inputField.ActivateInputField();
+        // focus cursor automatically
+        inputField.ActivateInputField();
         inputField.Select();
     }
 
@@ -79,6 +96,7 @@ public class NodeEditorUI : MonoBehaviour
         node.text = inputField.text;
         node.type = typeDropdown.options[typeDropdown.value].text;
         node.priority = priorityDropdown.value;
+        node.size = nodeSizeSlider.value;
 
         string newTitleText = titleInputField.text;
 
@@ -109,7 +127,7 @@ public class NodeEditorUI : MonoBehaviour
                 {
                     existing.content = newTitleText;
                     existing.x = node.x;
-                    existing.y = node.y - normalizedYOffset; // offset text below node icon
+                    existing.y = node.y;
                 }
             }
             else
@@ -119,7 +137,9 @@ public class NodeEditorUI : MonoBehaviour
                 newText.id = System.Guid.NewGuid().ToString();
                 newText.content = newTitleText;
                 newText.x = node.x;
-                newText.y = node.y - normalizedYOffset; // offset text below node icon
+                newText.y = node.y;
+                newText.yOffset = -normalizedYOffset; //Store default offset
+                newText.xOffset = 0f;
                 newText.fontSize = 14;
                 newText.priority = 0;
                 newText.colorHex = "#FFFFFF";
@@ -133,6 +153,7 @@ public class NodeEditorUI : MonoBehaviour
         }
 
         dataManager.Save();
+        dataManager.DrawNodes();
         dataManager.DrawMapTexts();
 
         CloseEditor();
@@ -166,7 +187,7 @@ public class NodeEditorUI : MonoBehaviour
     }
 
 
-    // ------------------------------ Text Editor Methods ---------------------------------
+    // ------------------------------ Title Editor Methods ---------------------------------
 
 
     public void OpenTitleAppearance()
@@ -192,31 +213,93 @@ public class NodeEditorUI : MonoBehaviour
             return;
         }
 
-        OpenTextEditor(textIndex);
+        OpenTitleEditor(textIndex);
     }
 
 
-    public void OpenTextEditor(int textIndex)
+    public void OpenTitleEditor(int textIndex)
     {
         activeTextIndex = textIndex;
 
         // Change Panels
-        textEditorPanel.SetActive(true);
+        titleEditorPanel.SetActive(true);
         nodeTextInputPanel.SetActive(false);
         buttonPanel.SetActive(false);
 
         MapTextData textData = dataManager.mapData.mapTexts[textIndex];
 
         // Populate fields
+        titleEditorInputField.text = textData.content;
+        titleFontSizeSlider.value = textData.fontSize;
+        titleArcSlider.value = textData.arc;
+        titleRotationSlider.value = textData.rotation;
+        titleXOffsetSlider.value = textData.xOffset;
+        titleYOffsetSlider.value = textData.yOffset;
+        titlePriorityDropdown.value = textData.priority;
+    }
+
+
+    public void saveTitleEditor()
+    {
+        if (activeTextIndex < 0) return;
+
+        MapTextData textData = dataManager.mapData.mapTexts[activeTextIndex];
+
+        // save changes to text data
+        textData.content = titleEditorInputField.text;
+        textData.priority = titlePriorityDropdown.value;
+        textData.fontSize = titleFontSizeSlider.value;
+        textData.arc = titleArcSlider.value;
+        textData.rotation = titleRotationSlider.value;
+        textData.xOffset = titleXOffsetSlider.value;
+        textData.yOffset = titleYOffsetSlider.value;
+
+        // Save data
+        dataManager.Save();
+
+        // Redraw map texts to reflect changes
+        dataManager.DrawMapTexts();
+
+        CloseTitleEditor();
+    }
+
+
+    public void CloseTitleEditor()
+    {
+        titleEditorPanel.SetActive(false);
+        buttonPanel.SetActive(true);
+        activeTextIndex = -1;
+    }
+
+    public string GetText()
+    {
+        return inputField.text;
+    }
+
+
+    // ------------------------------ Text Editor Methods ---------------------------------
+
+    public void OpenTextEditor(int textIndex)
+    {
+        activeTextIndex = textIndex;
+
+        // Change Panels
+        mapTextEditorPanel.SetActive(true);
+        nodeTextInputPanel.SetActive(false);
+        buttonPanel.SetActive(false);
+        titleEditorPanel.SetActive(false);
+
+        MapTextData textData = dataManager.mapData.mapTexts[textIndex];
+
+        // Populate fields
         mapTextInputField.text = textData.content;
-        fontSizeSlider.value = textData.fontSize;
+        textFontSizeSlider.value = textData.fontSize;
         textArcSlider.value = textData.arc;
         textRotationSlider.value = textData.rotation;
         textPriorityDropdown.value = textData.priority;
     }
 
-
-    public void SaveTextEditor()
+    public void saveTextEditor()
     {
         if (activeTextIndex < 0) return;
 
@@ -225,9 +308,10 @@ public class NodeEditorUI : MonoBehaviour
         // save changes to text data
         textData.content = mapTextInputField.text;
         textData.priority = textPriorityDropdown.value;
-        textData.fontSize = fontSizeSlider.value;
+        textData.fontSize = textFontSizeSlider.value;
         textData.arc = textArcSlider.value;
         textData.rotation = textRotationSlider.value;
+
 
         // Save data
         dataManager.Save();
@@ -238,16 +322,11 @@ public class NodeEditorUI : MonoBehaviour
         CloseTextEditor();
     }
 
-
     public void CloseTextEditor()
     {
-        textEditorPanel.SetActive(false);
+        mapTextEditorPanel.SetActive(false);
         buttonPanel.SetActive(true);
         activeTextIndex = -1;
     }
 
-    public string GetText()
-    {
-        return inputField.text;
-    }
 }
