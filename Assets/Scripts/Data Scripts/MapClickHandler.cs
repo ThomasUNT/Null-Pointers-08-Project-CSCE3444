@@ -11,7 +11,7 @@ public class MapClickHandler : MonoBehaviour
 
     void Update()
     {
-        if (!placeMode) return;
+        if (!placeMode && !textPlaceMode) return;
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -34,17 +34,29 @@ public class MapClickHandler : MonoBehaviour
                     normalizedY < 0f || normalizedY > 1f)
                 {
                     Debug.Log("Clicked outside map bounds - ignoring.");
-                    placeMode = false;   // Optional: exit place mode
+                    placeMode = false;
+                    textPlaceMode = false;
                     return;
                 }
 
-                dataManager.AddNode(new Vector2(normalizedX, normalizedY));
+                if (textPlaceMode)
+                {
+                    dataManager.AddText(new Vector2(normalizedX, normalizedY));
+                    editorUI.OpenTextEditor(dataManager.mapData.mapTexts.Count - 1);
+                    Debug.Log($"Saved text at {normalizedX}, {normalizedY}");
+                    textPlaceMode = false;
+                    return;
+                }
+                else
+                {
+                    dataManager.AddNode(new Vector2(normalizedX, normalizedY));
 
-                editorUI.OpenEditor(dataManager.mapData.nodes.Count - 1);
+                    editorUI.OpenEditor(dataManager.mapData.nodes.Count - 1);
 
-                Debug.Log($"Saved node at {normalizedX}, {normalizedY}");
+                    Debug.Log($"Saved node at {normalizedX}, {normalizedY}");
 
-                placeMode = false;
+                    placeMode = false;
+                }
             }
         }
     }

@@ -103,6 +103,14 @@ public class MapDataManager : MonoBehaviour
         DrawNodes();
     }
 
+    public void AddText(Vector2 position)
+    {
+        MapTextData textData = new MapTextData(position.x, position.y);
+        mapData.mapTexts.Add(textData);
+        //Save();
+        DrawMapTexts();
+    }
+
     private Sprite GetSpriteForType(string type)
     {
         switch (type)
@@ -223,10 +231,12 @@ public class MapDataManager : MonoBehaviour
                 NodeData node = mapData.nodes.Find(n => n.titleTextId == textData.id);
                 if (node != null)
                 {
+                    editorUI.CloseTextEditor();
                     editorUI.OpenTitleEditor(mapData.mapTexts.FindIndex(t => t.id == textData.id));
                 }
                 else
                 {
+                    editorUI.CloseTitleEditor();
                     editorUI.OpenTextEditor(index);
                 }
             });
