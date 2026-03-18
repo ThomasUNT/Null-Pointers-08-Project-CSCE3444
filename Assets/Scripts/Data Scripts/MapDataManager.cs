@@ -99,7 +99,7 @@ public class MapDataManager : MonoBehaviour
     {
         NodeData node = new NodeData(position.x, position.y);
         mapData.nodes.Add(node);
-        Save();
+        //Save(); 
         DrawNodes();
     }
 
