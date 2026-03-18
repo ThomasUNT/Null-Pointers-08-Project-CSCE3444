@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.IO;
 using System.Collections.Generic;
 using System.Collections;
@@ -212,6 +213,23 @@ public class MapDataManager : MonoBehaviour
             textObj.transform.localScale = Vector3.one / mapScale;
 
             spawnedTexts.Add(textObj);
+
+            int index = i; // capture local variable for closure
+            Button btn = textObj.GetComponent<Button>();
+            btn.onClick.RemoveAllListeners(); // make sure we don't double-add listeners
+            btn.onClick.AddListener(() =>
+            {
+                // Check if this text is a node title
+                NodeData node = mapData.nodes.Find(n => n.titleTextId == textData.id);
+                if (node != null)
+                {
+                    editorUI.OpenTitleEditor(mapData.mapTexts.FindIndex(t => t.id == textData.id));
+                }
+                else
+                {
+                    editorUI.OpenTextEditor(index);
+                }
+            });
         }
     }
 

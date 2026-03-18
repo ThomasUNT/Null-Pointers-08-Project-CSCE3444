@@ -6,6 +6,7 @@ public class MapClickHandler : MonoBehaviour
     public RectTransform mapRect;
     public MapDataManager dataManager;
     public bool placeMode = false;
+    public bool textPlaceMode = false;
     public NodeEditorUI editorUI;
 
     void Update()
