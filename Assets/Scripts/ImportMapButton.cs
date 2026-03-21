@@ -52,7 +52,9 @@ public class ImportMapButton : MonoBehaviour
         Directory.CreateDirectory(mapFolder);
 
         // Copy image as map.png
-        string destinationImage = Path.Combine(mapFolder, "map.png");
+        string extension = Path.GetExtension(sourcePath);
+        string destinationImage = Path.Combine(mapFolder, "map" + extension);
+
         File.Copy(sourcePath, destinationImage, true);
 
         Debug.Log("Map imported to: " + mapFolder);
