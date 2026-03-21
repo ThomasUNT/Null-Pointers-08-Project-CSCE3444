@@ -4,6 +4,9 @@ using SFB;
 
 public class ImportMapButton : MonoBehaviour
 {
+    public SceneLoader sceneLoader;
+    public string sceneToLoad = "AddInfoNodes";
+
     public void ImportMap()
     {
         var extensions = new[] {
@@ -65,5 +68,7 @@ public class ImportMapButton : MonoBehaviour
         // Save folder path for later use
         PlayerPrefs.SetString("LastMapFolder", mapFolder);
         PlayerPrefs.Save();
+
+        sceneLoader.LoadScene(sceneToLoad);
     }
 }
