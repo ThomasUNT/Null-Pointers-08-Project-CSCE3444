@@ -55,6 +55,7 @@ public class NodeEditorUI : MonoBehaviour
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
         titleEditorPanel.SetActive(false);
+        mapTextEditorPanel.SetActive(false);
 
         // populate fields with data from json
         NodeData node = dataManager.mapData.nodes[nodeIndex];
