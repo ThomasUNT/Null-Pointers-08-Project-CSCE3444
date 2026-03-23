@@ -179,6 +179,9 @@ public class MapDataManager : MonoBehaviour
 
             GameObject textObj = Instantiate(mapTextPrefab, mapRect);
 
+            textObj.GetComponent<MapTextIcon>()
+            .Initialize(i, editorUI, mapData);
+
             // Get normalized base position
             float finalNormalizedX = textData.x;
             float finalNormalizedY = textData.y;
@@ -221,25 +224,6 @@ public class MapDataManager : MonoBehaviour
             textObj.transform.localScale = Vector3.one / mapScale;
 
             spawnedTexts.Add(textObj);
-
-            int index = i; // capture local variable for closure
-            Button btn = textObj.GetComponent<Button>();
-            btn.onClick.RemoveAllListeners(); // make sure we don't double-add listeners
-            btn.onClick.AddListener(() =>
-            {
-                // Check if this text is a node title
-                NodeData node = mapData.nodes.Find(n => n.titleTextId == textData.id);
-                if (node != null)
-                {
-                    editorUI.CloseTextEditor();
-                    editorUI.OpenTitleEditor(mapData.mapTexts.FindIndex(t => t.id == textData.id));
-                }
-                else
-                {
-                    editorUI.CloseTitleEditor();
-                    editorUI.OpenTextEditor(index);
-                }
-            });
         }
     }
 

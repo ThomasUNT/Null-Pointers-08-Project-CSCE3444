@@ -116,6 +116,21 @@ public class MapClickHandler : MonoBehaviour
         dragStartObjectPos = new Vector2(node.x, node.y);
     }
 
+    public void BeginTextDrag(int textIndex, Vector2 screenPosition)
+    {
+        if (!TryGetLocalPoint(screenPosition, out Vector2 localPoint))
+            return;
+
+        MapTextData text = dataManager.mapData.mapTexts[textIndex];
+
+        isDragging = true;
+        draggingTextIndex = textIndex;
+        draggingNodeIndex = -1;
+
+        dragStartMousePos = localPoint;
+        dragStartObjectPos = new Vector2(text.x, text.y);
+    }
+
     private void HandleDragging()
     {
         if (!isDragging) return;
@@ -159,12 +174,43 @@ public class MapClickHandler : MonoBehaviour
             dataManager.DrawMapTexts();
         }
 
+        // Move text (and node if this text is a title)
+        if (draggingTextIndex >= 0)
+        {
+            MapTextData text = dataManager.mapData.mapTexts[draggingTextIndex];
+
+            float newX = Mathf.Clamp(dragStartObjectPos.x + delta.x, 0f, 1f);
+            float newY = Mathf.Clamp(dragStartObjectPos.y + delta.y, 0f, 1f);
+
+            // Calculate actual movement delta
+            float deltaX = newX - text.x;
+            float deltaY = newY - text.y;
+
+            text.x = newX;
+            text.y = newY;
+
+            // Check if this text is a node title
+            NodeData node = dataManager.mapData.nodes
+                .Find(n => n.titleTextId == text.id);
+
+            if (node != null)
+            {
+                node.x += deltaX;
+                node.y += deltaY;
+            }
+
+            dataManager.DrawNodes();
+            dataManager.DrawMapTexts();
+        }
+
         // Stop dragging when mouse released
         if (Input.GetMouseButtonUp(0))
         {
             isDragging = false;
             draggingNodeIndex = -1;
             draggingTextIndex = -1;
+
+            dataManager.Save();
         }
     }
 }
