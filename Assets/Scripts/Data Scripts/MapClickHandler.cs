@@ -15,49 +15,75 @@ public class MapClickHandler : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            Vector2 localPoint;
-
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                mapRect,
-                Input.mousePosition,
-                null,
-                out localPoint))
-            {
-                Rect rect = mapRect.rect;
-
-                // Convert to 0–1 range
-                float normalizedX = (localPoint.x - rect.x) / rect.width;
-                float normalizedY = (localPoint.y - rect.y) / rect.height;
-
-                // Ignore clicks outside map bounds
-                if (normalizedX < 0f || normalizedX > 1f ||
-                    normalizedY < 0f || normalizedY > 1f)
-                {
-                    Debug.Log("Clicked outside map bounds - ignoring.");
-                    placeMode = false;
-                    textPlaceMode = false;
-                    return;
-                }
-
-                if (textPlaceMode)
-                {
-                    dataManager.AddText(new Vector2(normalizedX, normalizedY));
-                    editorUI.OpenTextEditor(dataManager.mapData.mapTexts.Count - 1);
-                    Debug.Log($"Saved text at {normalizedX}, {normalizedY}");
-                    textPlaceMode = false;
-                    return;
-                }
-                else
-                {
-                    dataManager.AddNode(new Vector2(normalizedX, normalizedY));
-
-                    editorUI.OpenEditor(dataManager.mapData.nodes.Count - 1);
-
-                    Debug.Log($"Saved node at {normalizedX}, {normalizedY}");
-
-                    placeMode = false;
-                }
-            }
+            HandleMapClick(Input.mousePosition);
         }
+    }
+
+    private void HandleMapClick(Vector2 screenPosition)
+    {
+        if (!TryGetLocalPoint(screenPosition, out Vector2 localPoint))
+            return;
+
+        if (!TryGetNormalizedPoint(localPoint, out Vector2 normalizedPoint))
+        {
+            Debug.Log("Clicked outside map bounds - ignoring.");
+            placeMode = false;
+            textPlaceMode = false;
+            return;
+        }
+
+        if (textPlaceMode)
+        {
+            PlaceText(normalizedPoint);
+        }
+        else
+        {
+            PlaceNode(normalizedPoint);
+        }
+    }
+
+    private bool TryGetLocalPoint(Vector2 screenPosition, out Vector2 localPoint)
+    {
+        return RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            mapRect,
+            screenPosition,
+            null,
+            out localPoint
+        );
+    }
+
+    private bool TryGetNormalizedPoint(Vector2 localPoint, out Vector2 normalizedPoint)
+    {
+        Rect rect = mapRect.rect;
+
+        float normalizedX = (localPoint.x - rect.x) / rect.width;
+        float normalizedY = (localPoint.y - rect.y) / rect.height;
+
+        normalizedPoint = new Vector2(normalizedX, normalizedY);
+
+        return normalizedX >= 0f && normalizedX <= 1f &&
+               normalizedY >= 0f && normalizedY <= 1f;
+    }
+
+    private void PlaceNode(Vector2 normalizedPoint)
+    {
+        dataManager.AddNode(normalizedPoint);
+
+        editorUI.OpenEditor(dataManager.mapData.nodes.Count - 1);
+
+        Debug.Log($"Saved node at {normalizedPoint.x}, {normalizedPoint.y}");
+
+        placeMode = false;
+    }
+
+    private void PlaceText(Vector2 normalizedPoint)
+    {
+        dataManager.AddText(normalizedPoint);
+
+        editorUI.OpenTextEditor(dataManager.mapData.mapTexts.Count - 1);
+
+        Debug.Log($"Saved text at {normalizedPoint.x}, {normalizedPoint.y}");
+
+        textPlaceMode = false;
     }
 }
