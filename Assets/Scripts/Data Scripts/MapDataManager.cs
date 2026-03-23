@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.IO;
 using System.Collections.Generic;
 using System.Collections;
@@ -98,8 +99,16 @@ public class MapDataManager : MonoBehaviour
     {
         NodeData node = new NodeData(position.x, position.y);
         mapData.nodes.Add(node);
-        Save();
+        //Save(); 
         DrawNodes();
+    }
+
+    public void AddText(Vector2 position)
+    {
+        MapTextData textData = new MapTextData(position.x, position.y);
+        mapData.mapTexts.Add(textData);
+        //Save();
+        DrawMapTexts();
     }
 
     private Sprite GetSpriteForType(string type)
@@ -169,6 +178,9 @@ public class MapDataManager : MonoBehaviour
             var textData = mapData.mapTexts[i];
 
             GameObject textObj = Instantiate(mapTextPrefab, mapRect);
+
+            textObj.GetComponent<MapTextIcon>()
+            .Initialize(i, editorUI, mapData);
 
             // Get normalized base position
             float finalNormalizedX = textData.x;

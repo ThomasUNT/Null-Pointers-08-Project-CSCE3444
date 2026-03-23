@@ -10,4 +10,11 @@ public class UIController : MonoBehaviour
 
         Debug.Log("Place Mode: " + clickHandler.placeMode);
     }
+
+    public void ToggleTextPlaceMode()
+    {
+        clickHandler.textPlaceMode = !clickHandler.textPlaceMode;
+
+        Debug.Log("Text Place Mode: " + clickHandler.textPlaceMode);
+    }
 }
