@@ -40,17 +40,17 @@ public class NodeEditorUI : MonoBehaviour
 
     [SerializeField] private MapDataManager dataManager;
 
-    private int activeNodeIndex = -1;
+    private NodeData activeNode = null;
+
+    //private int activeNodeIndex = -1;
     private int activeTextIndex = -1;
 
 
     // ------------------------------ Node Editor Methods ---------------------------------
 
-    public void OpenEditor(int nodeIndex)
+    public void OpenEditor(NodeData node)
     {
-        activeNodeIndex = nodeIndex;
-
-        Debug.Log("OpenEditor called for node " + nodeIndex);
+        activeNode = node;
 
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
@@ -58,8 +58,6 @@ public class NodeEditorUI : MonoBehaviour
         mapTextEditorPanel.SetActive(false);
 
         // populate fields with data from json
-        NodeData node = dataManager.mapData.nodes[nodeIndex];
-
         inputField.text = node.text;
         priorityDropdown.value = node.priority;
         nodeSizeSlider.value = node.size;
@@ -69,7 +67,7 @@ public class NodeEditorUI : MonoBehaviour
 
         typeDropdown.value = typeIndex >= 0 ? typeIndex : 0;
 
-        if (!string.IsNullOrEmpty(node.titleTextId))
+        if (!string.IsNullOrEmpty(activeNode.titleTextId))
         {
             MapTextData titleData = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
 
@@ -90,9 +88,9 @@ public class NodeEditorUI : MonoBehaviour
 
     public void SaveNodeText()
     {
-        if (activeNodeIndex < 0) return;
+        if (activeNode == null) return;
 
-        NodeData node = dataManager.mapData.nodes[activeNodeIndex];
+        NodeData node = activeNode;
 
         node.text = inputField.text;
         node.type = typeDropdown.options[typeDropdown.value].text;
@@ -162,9 +160,9 @@ public class NodeEditorUI : MonoBehaviour
 
     public void DeleteNode()
     {
-        if (activeNodeIndex < 0) return;
+        if (activeNode == null) return;
 
-        NodeData node = dataManager.mapData.nodes[activeNodeIndex];
+        NodeData node = activeNode;
 
         if (!string.IsNullOrEmpty(node.titleTextId))
         {
@@ -173,7 +171,7 @@ public class NodeEditorUI : MonoBehaviour
                 dataManager.mapData.mapTexts.Remove(title);
         }
 
-        dataManager.mapData.nodes.RemoveAt(activeNodeIndex);
+        dataManager.mapData.nodes.Remove(activeNode);
         dataManager.Save();
         dataManager.DrawNodes();
 
@@ -184,7 +182,7 @@ public class NodeEditorUI : MonoBehaviour
     {
         nodeTextInputPanel.SetActive(false);
         buttonPanel.SetActive(true);
-        activeNodeIndex = -1;
+        activeNode = null;
     }
 
 
@@ -193,9 +191,9 @@ public class NodeEditorUI : MonoBehaviour
 
     public void OpenTitleAppearance()
     {
-        if (activeNodeIndex < 0) return;
+        if (activeNode == null) return;
 
-        NodeData node = dataManager.mapData.nodes[activeNodeIndex];
+        NodeData node = activeNode;
 
         // if node has no title text assigned, we can't open the editor
         if (string.IsNullOrEmpty(node.titleTextId))

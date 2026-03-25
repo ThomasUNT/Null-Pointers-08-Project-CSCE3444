@@ -22,6 +22,9 @@ public class MapDataManager : MonoBehaviour
     public Sprite majorCitySprite;
     public Sprite defaultSprite;
 
+/*    float maxZoom = 2.0f; // TEMP placeholder
+    float normalizedZoom = mapRect.localScale.x / maxZoom;*/
+
 
     List<GameObject> spawnedIcons = new List<GameObject>();
     List<GameObject> spawnedTexts = new List<GameObject>();
@@ -47,7 +50,6 @@ public class MapDataManager : MonoBehaviour
     {
         yield return null; // wait 1 frame
         DrawNodes();
-        DrawMapTexts();
     }
 
     void Update()
@@ -95,12 +97,14 @@ public class MapDataManager : MonoBehaviour
         }
     }
 
-    public void AddNode(Vector2 position)
+    public NodeData AddNode(Vector2 position)
     {
         NodeData node = new NodeData(position.x, position.y);
         mapData.nodes.Add(node);
         //Save(); 
         DrawNodes();
+
+        return node;
     }
 
     public void AddText(Vector2 position)
@@ -126,16 +130,18 @@ public class MapDataManager : MonoBehaviour
 
     public void DrawNodes()
     {
+        float mapScale = mapRect.localScale.x;
+        float maxZoom = 5.0f; // TEMPORARY
+        float normalizedZoom = Mathf.Clamp01(mapScale / maxZoom);
+
         // clear old icons
         foreach (var icon in spawnedIcons)
-            Destroy(icon);
+            DestroyImmediate(icon);
 
         spawnedIcons.Clear();
 
-        for (int i = 0; i < mapData.nodes.Count; i++)
+        foreach (var node in mapData.nodes)
         {
-            var node = mapData.nodes[i];
-
             GameObject icon = Instantiate(nodeIconPrefab, mapRect);
 
             Rect rect = mapRect.rect;
@@ -150,13 +156,13 @@ public class MapDataManager : MonoBehaviour
             image.sprite = GetSpriteForType(node.type);
 
             // compensate for map scaling
-            float mapScale = mapRect.localScale.x;
-
             float finalScale = (defaultNodeSizeMultiplier * node.size) / mapScale;
             icon.transform.localScale = Vector3.one * finalScale;
 
             icon.GetComponent<NodeIcon>()
-                .Initialize(i, editorUI);
+                .Initialize(node, editorUI);
+
+            icon.SetActive(ShouldRender(node.priority, normalizedZoom));
 
             spawnedIcons.Add(icon);
         }
@@ -165,9 +171,13 @@ public class MapDataManager : MonoBehaviour
 
     public void DrawMapTexts()
     {
+        float mapScale = mapRect.localScale.x;
+        float maxZoom = 5.0f;
+        float normalizedZoom = Mathf.Clamp01(mapScale / maxZoom);
+
         // clear old texts
         foreach (var textObj in spawnedTexts)
-            Destroy(textObj);
+            DestroyImmediate(textObj);
         
         spawnedTexts.Clear();
 
@@ -176,6 +186,9 @@ public class MapDataManager : MonoBehaviour
         for (int i = 0; i < mapData.mapTexts.Count; i++)
         {
             var textData = mapData.mapTexts[i];
+
+            if (!ShouldRender(textData.priority, normalizedZoom))
+                continue;
 
             GameObject textObj = Instantiate(mapTextPrefab, mapRect);
 
@@ -187,7 +200,7 @@ public class MapDataManager : MonoBehaviour
             float finalNormalizedY = textData.y;
 
             // Adjust offsets based on node size and map zoom
-            float mapScale = mapRect.localScale.x; // <1 = zoomed out, icons bigger
+            //float mapScale = mapRect.localScale.x; // <1 = zoomed out, icons bigger
             float nodeSize = 1f;
 
             // If this text is attached to a node, get its size
@@ -227,6 +240,23 @@ public class MapDataManager : MonoBehaviour
         }
     }
 
+    // Temporary - Placeholder thresholds until we implement user-set map settings
+    private float[] priorityThresholds = new float[]
+{
+    0f,    // always
+    0f,
+    0.22f, // any zoom
+    0.5f,  // mid zoom
+    0.6f     // max zoom
+};
+
+    private bool ShouldRender(int priority, float normalizedZoom)
+    {
+        if (priority < 0 || priority >= priorityThresholds.Length)
+            return true;
+
+        return normalizedZoom >= priorityThresholds[priority];
+    }
 
     public void Save()
     {

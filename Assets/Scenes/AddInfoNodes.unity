@@ -15293,6 +15293,7 @@ MonoBehaviour:
   minScale: 1
   maxScale: 3
   mapRect: {fileID: 863549278}
+  mapDataManager: {fileID: 55223473}
 --- !u!1 &1706143766
 GameObject:
   m_ObjectHideFlags: 0
@@ -18356,6 +18357,7 @@ MonoBehaviour:
   placeMode: 0
   textPlaceMode: 0
   editorUI: {fileID: 263706681}
+  isDragging: 0
 --- !u!4 &2108143300
 Transform:
   m_ObjectHideFlags: 0
