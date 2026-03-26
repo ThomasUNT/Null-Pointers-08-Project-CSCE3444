@@ -8,6 +8,7 @@ public class MapController : MonoBehaviour
     public float minScale = 0.5f;
     public float maxScale = 2f;
     public RectTransform mapRect;
+    public MapDataManager mapDataManager;
 
     private RectTransform mapRT;
 
@@ -61,6 +62,12 @@ public class MapController : MonoBehaviour
         // Adjust anchoredPosition so point under mouse stays put
         Vector2 newPivotDelta = pivotDelta * (newScale / oldScale);
         mapRT.anchoredPosition += pivotDelta - newPivotDelta;
+
+        if (mapDataManager != null)
+        {
+            mapDataManager.DrawNodes();
+            mapDataManager.DrawMapTexts(); 
+        }
 
         ClampToWindow();
     }

@@ -4,6 +4,9 @@ using SFB;
 
 public class ImportMapButton : MonoBehaviour
 {
+    public SceneLoader sceneLoader;
+    public string sceneToLoad = "AddInfoNodes";
+
     public void ImportMap()
     {
         var extensions = new[] {
@@ -49,7 +52,9 @@ public class ImportMapButton : MonoBehaviour
         Directory.CreateDirectory(mapFolder);
 
         // Copy image as map.png
-        string destinationImage = Path.Combine(mapFolder, "map.png");
+        string extension = Path.GetExtension(sourcePath);
+        string destinationImage = Path.Combine(mapFolder, "map" + extension);
+
         File.Copy(sourcePath, destinationImage, true);
 
         Debug.Log("Map imported to: " + mapFolder);
@@ -65,5 +70,7 @@ public class ImportMapButton : MonoBehaviour
         // Save folder path for later use
         PlayerPrefs.SetString("LastMapFolder", mapFolder);
         PlayerPrefs.Save();
+
+        sceneLoader.LoadScene(sceneToLoad);
     }
 }
