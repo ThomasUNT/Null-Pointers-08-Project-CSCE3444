@@ -4,13 +4,14 @@ using UnityEngine.EventSystems;
 
 public class NodeIcon : MonoBehaviour, IPointerDownHandler
 {
+    private NodeData nodeData;
     int nodeIndex;
     NodeEditorUI editorUI;
     MapClickHandler mapClickHandler;
 
-    public void Initialize(int index, NodeEditorUI ui)
+    public void Initialize(NodeData node, NodeEditorUI ui)
     {
-        nodeIndex = index;
+        nodeData = node;
         editorUI = ui;
         mapClickHandler = FindFirstObjectByType<MapClickHandler>();
 
@@ -19,14 +20,14 @@ public class NodeIcon : MonoBehaviour, IPointerDownHandler
 
     void OnClick()
     {
-        editorUI.OpenEditor(nodeIndex);
+        editorUI.OpenEditor(nodeData);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
-            mapClickHandler.BeginNodeDrag(nodeIndex, eventData.position);
+            mapClickHandler.BeginNodeDrag(nodeData, eventData.position);
         }
     }
 }
