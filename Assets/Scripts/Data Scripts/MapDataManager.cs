@@ -109,6 +109,20 @@ public class MapDataManager : MonoBehaviour
         mapData.mapTexts.Add(textData);
         //Save();
         DrawMapTexts();
+        
+    string savedFont = mapData.mapSettings.fontName;
+    if (!string.IsNullOrEmpty(savedFont))
+    {
+       TMPro.TMP_FontAsset font = Resources.Load<TMPro.TMP_FontAsset>("Fonts/" + savedFont);
+       if (font != null)
+       {
+       GameObject newest = spawnedTexts[spawnedTexts.Count - 1];
+       TMPro.TMP_Text tmp = newest.GetComponent<TMPro.TMP_Text>();
+       if(tmp != null)
+          tmp.font = font;
+        }
+      }
+        
     }
 
     private Sprite GetSpriteForType(string type)
@@ -244,4 +258,5 @@ public class MapDataManager : MonoBehaviour
             mapData = JsonUtility.FromJson<MapData>(json);
         }
     }
-}
+    
+ }
