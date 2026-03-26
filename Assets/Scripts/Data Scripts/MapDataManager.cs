@@ -179,8 +179,9 @@ public class MapDataManager : MonoBehaviour
     public void DrawMapTexts()
     {
         float mapScale = mapRect.localScale.x;
-        float maxZoom = 5.0f;
-        float normalizedZoom = Mathf.Clamp01(mapScale / maxZoom);
+        float minZoom = 1f;
+        float maxZoom = 3f;
+        float normalizedZoom = Mathf.Clamp01((mapScale - minZoom) / (maxZoom - minZoom));
 
         // clear old texts
         foreach (var textObj in spawnedTexts)
