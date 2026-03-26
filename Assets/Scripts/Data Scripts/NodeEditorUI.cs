@@ -327,13 +327,13 @@ public class NodeEditorUI : MonoBehaviour
 
     public void DeleteActiveText()
     {
-        if (activeTextIndex < 0) return;
+        if (activeText == null) return;
 
-        MapTextData textToDelete = dataManager.mapData.mapTexts[activeTextIndex];
+        MapTextData textToDelete = activeText;
 
         // Check if this text is a title of any node
         NodeData attachedNode = dataManager.mapData.nodes
-            .Find(n => n.titleTextId == textToDelete.id);
+            .Find(n => n.titleTextId == activeText.id);
 
         if (attachedNode != null)
         {
@@ -341,7 +341,7 @@ public class NodeEditorUI : MonoBehaviour
         }
 
         // Remove the text
-        dataManager.mapData.mapTexts.RemoveAt(activeTextIndex);
+        dataManager.mapData.mapTexts.Remove(activeText);
 
         // Save and redraw
         dataManager.Save();
@@ -352,7 +352,7 @@ public class NodeEditorUI : MonoBehaviour
         CloseTextEditor();
         CloseTitleEditor();
 
-        activeTextIndex = -1;
+        activeText = null;
     }
 
 }

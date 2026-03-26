@@ -15563,6 +15563,7 @@ MonoBehaviour:
   minScale: 1
   maxScale: 3
   mapRect: {fileID: 863549278}
+  mapDataManager: {fileID: 55223473}
 --- !u!1 &1603861432
 GameObject:
   m_ObjectHideFlags: 0
