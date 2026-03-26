@@ -23,8 +23,8 @@ public class MapDataManager : MonoBehaviour
     public Sprite defaultSprite;
 
 
-    List<GameObject> spawnedIcons = new List<GameObject>();
-    List<GameObject> spawnedTexts = new List<GameObject>();
+    public List<GameObject> spawnedIcons = new List<GameObject>();
+    public List<GameObject> spawnedTexts = new List<GameObject>();
 
     void Start()
     {
