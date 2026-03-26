@@ -325,4 +325,34 @@ public class NodeEditorUI : MonoBehaviour
         activeText = null;
     }
 
+    public void DeleteActiveText()
+    {
+        if (activeTextIndex < 0) return;
+
+        MapTextData textToDelete = dataManager.mapData.mapTexts[activeTextIndex];
+
+        // Check if this text is a title of any node
+        NodeData attachedNode = dataManager.mapData.nodes
+            .Find(n => n.titleTextId == textToDelete.id);
+
+        if (attachedNode != null)
+        {
+            attachedNode.titleTextId = "";
+        }
+
+        // Remove the text
+        dataManager.mapData.mapTexts.RemoveAt(activeTextIndex);
+
+        // Save and redraw
+        dataManager.Save();
+        dataManager.DrawMapTexts();
+        dataManager.DrawNodes();
+
+        // Close whichever editor is open
+        CloseTextEditor();
+        CloseTitleEditor();
+
+        activeTextIndex = -1;
+    }
+
 }
