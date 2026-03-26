@@ -2,13 +2,15 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.IO;
+using System.Collections.Generic;
 
 public class NotesManager : MonoBehaviour
 {
+    [Header("UI References")]
     public Transform notesListContent;
     public GameObject noteButtonPrefab;
-
     public TMP_InputField noteEditor;
+    public TMP_InputField titleEditor;
 
     private string folderPath;
     private string currentNotePath;
@@ -21,65 +23,75 @@ public class NotesManager : MonoBehaviour
             Directory.CreateDirectory(folderPath);
 
         LoadNotes();
+
+        noteEditor.onEndEdit.AddListener(delegate { SaveNote(); });
+        titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
     }
 
-    void LoadNotes()
+    public void LoadNotes()
     {
         foreach (Transform child in notesListContent)
             Destroy(child.gameObject);
 
-        string[] files = Directory.GetFiles(folderPath, "*.txt");
+        if (!Directory.Exists(folderPath)) return;
+
+        string[] files = Directory.GetFiles(folderPath, "*.md");
 
         foreach (string file in files)
         {
             GameObject btn = Instantiate(noteButtonPrefab, notesListContent);
-
             string fileName = Path.GetFileNameWithoutExtension(file);
-
             btn.GetComponentInChildren<TMP_Text>().text = fileName;
 
-            btn.GetComponent<Button>().onClick.AddListener(() =>
-            {
-                OpenNote(file);
-            });
+            string path = file;
+            btn.GetComponent<Button>().onClick.AddListener(() => OpenNote(path));
         }
     }
 
     public void CreateNote()
     {
-        string noteName = "Note_" + System.DateTime.Now.Ticks;
+        string noteName = "UntitledNote_" + System.DateTime.Now.ToString("yyMMdd_HHmm");
+        string path = Path.Combine(folderPath, noteName + ".md");
 
-        string path = Path.Combine(folderPath, noteName + ".txt");
-
-        File.WriteAllText(path, "");
-
+        File.WriteAllText(path, "# " + noteName);
         LoadNotes();
+        OpenNote(path);
     }
 
     void OpenNote(string path)
     {
         currentNotePath = path;
-
+        titleEditor.text = Path.GetFileNameWithoutExtension(path);
         noteEditor.text = File.ReadAllText(path);
-    }
-
-    public void DeleteNote()
-    {
-        if (currentNotePath == null) return;
-
-        File.Delete(currentNotePath);
-
-        currentNotePath = null;
-
-        noteEditor.text = "";
-
-        LoadNotes();
     }
 
     public void SaveNote()
     {
-        if (currentNotePath == null) return;
-
+        if (string.IsNullOrEmpty(currentNotePath)) return;
         File.WriteAllText(currentNotePath, noteEditor.text);
+    }
+
+    public void RenameNote()
+    {
+        if (string.IsNullOrEmpty(currentNotePath)) return;
+
+        string newPath = Path.Combine(folderPath, titleEditor.text + ".md");
+
+        if (currentNotePath != newPath && !File.Exists(newPath))
+        {
+            File.Move(currentNotePath, newPath);
+            currentNotePath = newPath;
+            LoadNotes();
+        }
+    }
+
+    public void DeleteNote()
+    {
+        if (string.IsNullOrEmpty(currentNotePath)) return;
+        File.Delete(currentNotePath);
+        currentNotePath = null;
+        noteEditor.text = "";
+        titleEditor.text = "";
+        LoadNotes();
     }
 }
