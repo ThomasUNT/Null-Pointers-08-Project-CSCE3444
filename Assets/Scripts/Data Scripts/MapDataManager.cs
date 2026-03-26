@@ -107,12 +107,14 @@ public class MapDataManager : MonoBehaviour
         return node;
     }
 
-    public void AddText(Vector2 position)
+    public MapTextData AddText(Vector2 position)
     {
         MapTextData textData = new MapTextData(position.x, position.y);
         mapData.mapTexts.Add(textData);
         //Save();
         DrawMapTexts();
+
+        return textData;
     }
 
     private Sprite GetSpriteForType(string type)
@@ -131,8 +133,13 @@ public class MapDataManager : MonoBehaviour
     public void DrawNodes()
     {
         float mapScale = mapRect.localScale.x;
-        float maxZoom = 5.0f; // TEMPORARY
-        float normalizedZoom = Mathf.Clamp01(mapScale / maxZoom);
+        
+        // TEMPORARY
+        float minZoom = 1f;
+        float maxZoom = 3f;
+        float normalizedZoom = Mathf.Clamp01((mapScale - minZoom) / (maxZoom - minZoom));
+
+        Debug.Log("MapScale: " + mapRect.localScale.x);
 
         // clear old icons
         foreach (var icon in spawnedIcons)
@@ -183,17 +190,12 @@ public class MapDataManager : MonoBehaviour
 
         Rect rect = mapRect.rect;
 
-        for (int i = 0; i < mapData.mapTexts.Count; i++)
+        foreach (var textData in mapData.mapTexts)
         {
-            var textData = mapData.mapTexts[i];
-
-            if (!ShouldRender(textData.priority, normalizedZoom))
-                continue;
-
             GameObject textObj = Instantiate(mapTextPrefab, mapRect);
 
             textObj.GetComponent<MapTextIcon>()
-            .Initialize(i, editorUI, mapData);
+            .Initialize(textData, editorUI, mapData);
 
             // Get normalized base position
             float finalNormalizedX = textData.x;
@@ -236,19 +238,21 @@ public class MapDataManager : MonoBehaviour
             // compensate for map scaling
             textObj.transform.localScale = Vector3.one / mapScale;
 
+            textObj.SetActive(ShouldRender(textData.priority, normalizedZoom));
+
             spawnedTexts.Add(textObj);
         }
     }
 
     // Temporary - Placeholder thresholds until we implement user-set map settings
     private float[] priorityThresholds = new float[]
-{
-    0f,    // always
-    0f,
-    0.22f, // any zoom
-    0.5f,  // mid zoom
-    0.6f     // max zoom
-};
+    {
+        0f, // always
+        0f, // always
+        0.1f, // any zoom
+        0.5f, // mid zoom
+        0.9f // max zoom
+    };
 
     private bool ShouldRender(int priority, float normalizedZoom)
     {

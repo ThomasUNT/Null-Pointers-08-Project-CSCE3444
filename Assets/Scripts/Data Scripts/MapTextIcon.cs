@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 
 public class MapTextIcon : MonoBehaviour, IPointerDownHandler
 {
+    private MapTextData mapTextData;
     int textIndex;
     string textId;
 
@@ -11,15 +12,15 @@ public class MapTextIcon : MonoBehaviour, IPointerDownHandler
     MapClickHandler mapClickHandler;
     MapData mapData;
 
-    public void Initialize(int index, NodeEditorUI ui, MapData data)
+    public void Initialize(MapTextData mapText, NodeEditorUI ui, MapData data)
     {
-        textIndex = index;
         editorUI = ui;
         mapData = data;
+        mapTextData = mapText;
 
         mapClickHandler = FindFirstObjectByType<MapClickHandler>();
 
-        textId = mapData.mapTexts[index].id;
+        textId = mapText.id;
 
         GetComponent<Button>().onClick.AddListener(OnClick);
     }
@@ -32,14 +33,12 @@ public class MapTextIcon : MonoBehaviour, IPointerDownHandler
         if (node != null)
         {
             editorUI.CloseTextEditor();
-            editorUI.OpenTitleEditor(
-                mapData.mapTexts.FindIndex(t => t.id == textId)
-            );
+            editorUI.OpenTitleEditor(mapTextData);
         }
         else
         {
             editorUI.CloseTitleEditor();
-            editorUI.OpenTextEditor(textIndex);
+            editorUI.OpenTextEditor(mapTextData);
         }
     }
 
@@ -47,7 +46,7 @@ public class MapTextIcon : MonoBehaviour, IPointerDownHandler
     {
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
-            mapClickHandler.BeginTextDrag(textIndex, eventData.position);
+            mapClickHandler.BeginTextDrag(mapTextData, eventData.position);
         }
     }
 }
