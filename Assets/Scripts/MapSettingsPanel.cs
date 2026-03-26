@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.IO;
 using System.Collections.Generic;
 
 public class MapSettingsPanel : MonoBehaviour{
@@ -34,8 +33,8 @@ public class MapSettingsPanel : MonoBehaviour{
           if (mapScaleValueText != null)
               mapScaleValueText.text = v.ToString("F2");
     });
-  if (maxZoomSlider != null)
-    maxZoomSlider.onValueChanged.AddListener(v => {
+  if (mapZoomSlider != null)
+    mapZoomSlider.onValueChanged.AddListener(v => {
           if (mapZoomValueText != null)
               mapZoomValueText.text = v.ToString("F2");
  });
@@ -64,14 +63,20 @@ private void PopulateFontDropdown(){
     fontNames.Add(font.name);
 fontDropdown.AddOptions(fontNames);
 fontDropdown.onValueChanged.AddListener(OnFontSelected);
+
+   string savedFont = dataManager.mapData.mapSettings.fontName;
+   int savedIndex = availableFonts.FindIndex(f => f.name == savedFont);
+   if (savedIndex >= 0)
+       fontDropdown.SetValueWithoutNotify(savedIndex);
 }
 private void OnFontSelected(int index){
   if (index < 0 || index >= availableFonts.Count) return;
 
-   selectedFontIndex = indx;
+   selectedFontIndex = index;
    TMP_FontAsset chosenFont = availableFonts[index];
-
-  ApplyFontToAllMapTexts(chosenFont);
+   dataManager.mapData.mapSettings.fontName = chosenFont.name;
+   ApplyFontToAllMapTexts(chosenFont);
+   
    Debug.Log($"Font changed to: {chosenFont.name}");
 }
 private void ApplyFontToAllMapTexts(TMP_FontAsset font){
@@ -84,7 +89,7 @@ private void ApplyFontToAllMapTexts(TMP_FontAsset font){
 }
 public void OpenMapSettings(){
   mapSettingsPanel.SetActive(true);
-  buttonPanel.SetAcrive(false);
+  buttonPanel.SetActive(false);
 
 }
 public void CloseMapSettings(){
