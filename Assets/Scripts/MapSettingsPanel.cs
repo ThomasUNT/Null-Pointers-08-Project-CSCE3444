@@ -75,10 +75,12 @@ private void OnFontSelected(int index){
    Debug.Log($"Font changed to: {chosenFont.name}");
 }
 private void ApplyFontToAllMapTexts(TMP_FontAsset font){
-  TMP_Text[] allTexts = dataManager.mapRect.GetComponentsInChildren<TMP_Text>(true);
-
- foreach (var tmp in allTexts)
-    tmp.font = font;
+  foreach (var textObj in dataManager.spawnedTexts){
+     if (textObj == null)continue;
+     TMP_Text tmp = textObj.GetComponent<TMP_Text>();
+     if(tmp != null)
+        tmp.font = font;
+  }
 }
 public void OpenMapSettings(){
   mapSettingsPanel.SetActive(true);
