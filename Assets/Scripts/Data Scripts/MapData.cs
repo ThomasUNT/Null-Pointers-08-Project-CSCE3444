@@ -5,4 +5,5 @@ public class MapData
 {
     public List<NodeData> nodes = new List<NodeData>();
     public List<MapTextData> mapTexts = new List<MapTextData>();
+    public MapSettings mapSettings = new MapSettings();
 }
