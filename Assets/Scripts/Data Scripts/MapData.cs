@@ -7,3 +7,10 @@ public class MapData
     public List<MapTextData> mapTexts = new List<MapTextData>();
     public MapSettings mapSettings = new MapSettings();
 }
+[System.Serializable]
+public class MapSettings
+{
+    public float fontName;
+    public float mapScale;
+    public float mapZoom;
+}
