@@ -65,36 +65,6 @@ public class MapDataManager : MonoBehaviour
 
             spawnedIcons[i].transform.localScale = Vector3.one * finalScale;
         }
-
-        for (int i = 0; i < spawnedTexts.Count; i++)
-        {
-            var textObj = spawnedTexts[i];
-            var textData = mapData.mapTexts[i];
-
-            // Base normalized position
-            float baseX = textData.x;
-            float baseY = textData.y;
-
-            // Node size if this text is attached to a node
-            float nodeSize = 1f;
-            NodeData attachedNode = mapData.nodes.Find(n => n.titleTextId == textData.id);
-            if (attachedNode != null)
-                nodeSize = attachedNode.size;
-
-            // Scale offsets dynamically: offsets grow with node size and inversely with map scale
-            float scaledXOffset = textData.xOffset * (nodeSize * 0.7f) / mapScale;
-            float scaledYOffset = textData.yOffset * (nodeSize * 0.7f) / mapScale;
-
-            // Convert to pixel coordinates
-            Rect rect = mapRect.rect;
-            float xPos = rect.x + (baseX * rect.width) + (scaledXOffset * rect.width);
-            float yPos = rect.y + (baseY * rect.height) + (scaledYOffset * rect.height);
-
-            textObj.GetComponent<RectTransform>().anchoredPosition = new Vector2(xPos, yPos);
-
-            // Keep text visually consistent while zooming
-            textObj.transform.localScale = Vector3.one / mapScale;
-        }
     }
 
     public NodeData AddNode(Vector2 position)
