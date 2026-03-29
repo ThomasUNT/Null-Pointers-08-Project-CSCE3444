@@ -33,11 +33,11 @@ public class MapSettingsPanel : MonoBehaviour{
           if (mapScaleValueText != null)
               mapScaleValueText.text = v.ToString("F2");
     });
-  if (mapZoomSlider != null)
+   if (mapZoomSlider != null)
     mapZoomSlider.onValueChanged.AddListener(v => {
           if (mapZoomValueText != null)
               mapZoomValueText.text = v.ToString("F2");
- });
+    });
  
 }
 
@@ -45,7 +45,8 @@ private void LoadFontsFromResources(){
   availableFonts.Clear();
   TMP_FontAsset[] fonts = Resources.LoadAll<TMP_FontAsset>("Fonts");
 
-  foreach (var font in fonts){
+  foreach (var font in fonts)
+  {
     if (font != null)
       availableFonts.Add(font);
   }
@@ -55,21 +56,26 @@ private void LoadFontsFromResources(){
        Debug.Log($"MapSettingsPanel: Loaded {availableFonts.Count} fonts.");
 }
 
-private void PopulateFontDropdown(){
+private void PopulateFontDropdown()
+{
   if (fontDropdown == null) return;
+  
    fontDropdown.ClearOptions();
- List<string> fontNames = new List<string>();
- foreach (var font in availableFonts)
+ 
+   List<string> fontNames = new List<string>();
+   foreach (var font in availableFonts)
     fontNames.Add(font.name);
-fontDropdown.AddOptions(fontNames);
-fontDropdown.onValueChanged.AddListener(OnFontSelected);
+
+   fontDropdown.AddOptions(fontNames);
+   fontDropdown.onValueChanged.AddListener(OnFontSelected);
 
    string savedFont = dataManager.mapData.mapSettings.fontName;
    int savedIndex = availableFonts.FindIndex(f => f.name == savedFont);
    if (savedIndex >= 0)
        fontDropdown.SetValueWithoutNotify(savedIndex);
 }
-private void OnFontSelected(int index){
+private void OnFontSelected(int index)
+{
   if (index < 0 || index >= availableFonts.Count) return;
 
    selectedFontIndex = index;
@@ -79,21 +85,48 @@ private void OnFontSelected(int index){
    
    Debug.Log($"Font changed to: {chosenFont.name}");
 }
-private void ApplyFontToAllMapTexts(TMP_FontAsset font){
-  foreach (var textObj in dataManager.spawnedTexts){
+private void ApplyFontToAllMapTexts(TMP_FontAsset font)
+{
+  foreach (var textObj in dataManager.spawnedTexts)
+  {
      if (textObj == null)continue;
      TMP_Text tmp = textObj.GetComponent<TMP_Text>();
      if(tmp != null)
         tmp.font = font;
   }
 }
-public void OpenMapSettings(){
+public void OpenMapSettings()
+{
   mapSettingsPanel.SetActive(true);
   buttonPanel.SetActive(false);
+  PopulateFromMemory();
 
 }
-public void CloseMapSettings(){
+public void CloseMapSettings()
+{
  mapSettingsPanel.SetActive(false);
  buttonPanel.SetActive(true);
+  }
+public void PopulateFromMemory()
+{
+   MapSettings settings = dataManager.mapData.mapSettings;
+   if (mapScaleSlider != null)
+   {
+      mapScaleSlider.SetValueWithoutNotify(settings.mapScale);
+      if (mapScaleValueText != null)
+         mapScaleValueText.text = settings.mapScale.ToString("F2");
+   }
+   if (mapZoomSlider != null)
+   {
+      mapZoomSlider.SetValueWithoutNotify(settings.mapZoom);
+      if (mapZoomValueText != null)
+         mapZoomValueText.text = settings.mapZoom.ToString("F2");
+   }
+   if (fontDropdown != null)
+   {
+      int savedIndex = availableFonts.FindIndex(f => f.name == settings.fontName);
+      if (savedIndex >= 0)
+         fontDropdown.SetValueWithoutNotify(savedIndex);
+    }
   }
 }
