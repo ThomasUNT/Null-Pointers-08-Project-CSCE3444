@@ -24,7 +24,14 @@ public class MapSettingsPanel : MonoBehaviour{
   private List<TMP_FontAsset> availableFonts = new List<TMP_FontAsset>();
   private int selectedFontIndex = 0;
 
- void Start(){
+ void Start()
+ {
+    if(dataManager == null)
+    {
+       Debug.LogError("MapSettingsPanel : dataManager is not assigned!");
+       return;
+    }
+    
   LoadFontsFromResources();
   PopulateFontDropdown();
 
@@ -32,11 +39,13 @@ public class MapSettingsPanel : MonoBehaviour{
      mapScaleSlider.onValueChanged.AddListener(v => {
           if (mapScaleValueText != null)
               mapScaleValueText.text = v.ToString("F2");
+           dataManager.mapData.mapSettings.mapScale = v;
     });
    if (mapZoomSlider != null)
     mapZoomSlider.onValueChanged.AddListener(v => {
           if (mapZoomValueText != null)
               mapZoomValueText.text = v.ToString("F2");
+           dataManager.mapData.mapSettings.mapZoom = v;
     });
  
 }
@@ -44,7 +53,6 @@ public class MapSettingsPanel : MonoBehaviour{
 private void LoadFontsFromResources(){
   availableFonts.Clear();
   TMP_FontAsset[] fonts = Resources.LoadAll<TMP_FontAsset>("Fonts");
-
   foreach (var font in fonts)
   {
     if (font != null)
@@ -109,6 +117,7 @@ public void CloseMapSettings()
   }
 public void PopulateFromMemory()
 {
+   if(dataManager == null) return;
    MapSettings settings = dataManager.mapData.mapSettings;
    if (mapScaleSlider != null)
    {
