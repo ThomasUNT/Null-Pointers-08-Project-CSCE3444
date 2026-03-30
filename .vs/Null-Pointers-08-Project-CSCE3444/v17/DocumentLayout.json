@@ -5,10 +5,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{5B9D748B-631D-D703-0A96-243A80603D9A}|Assembly-CSharp.csproj|c:\\users\\matts\\onedrive\\documents\\github\\null-pointers-08-project-csce3444\\assets\\scripts\\notesmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5B9D748B-631D-D703-0A96-243A80603D9A}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\notesmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5B9D748B-631D-D703-0A96-243A80603D9A}|Assembly-CSharp.csproj|C:\\Users\\matts\\OneDrive\\Documents\\GitHub\\Null-Pointers-08-Project-CSCE3444\\assets\\scripts\\sceneloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5B9D748B-631D-D703-0A96-243A80603D9A}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\sceneloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,20 +14,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "SceneLoader.cs",
-              "DocumentMoniker": "C:\\Users\\matts\\OneDrive\\Documents\\GitHub\\Null-Pointers-08-Project-CSCE3444\\Assets\\Scripts\\SceneLoader.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\SceneLoader.cs",
-              "ToolTip": "C:\\Users\\matts\\OneDrive\\Documents\\GitHub\\Null-Pointers-08-Project-CSCE3444\\Assets\\Scripts\\SceneLoader.cs",
-              "RelativeToolTip": "Assets\\Scripts\\SceneLoader.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-06T05:20:57.111Z"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -40,7 +24,7 @@
               "RelativeDocumentMoniker": "Assets\\Scripts\\NotesManager.cs",
               "ToolTip": "C:\\Users\\matts\\OneDrive\\Documents\\GitHub\\Null-Pointers-08-Project-CSCE3444\\Assets\\Scripts\\NotesManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\NotesManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAkAAAAAAAAAA==",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAiwFwAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-06T05:01:02.487Z",
               "EditorCaption": ""

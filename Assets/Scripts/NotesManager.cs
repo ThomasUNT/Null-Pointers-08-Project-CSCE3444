@@ -13,15 +13,15 @@ public class NotesManager : MonoBehaviour
     public TMP_InputField titleEditor;
 
     [Header("Dynamic Map Settings")]
-    public string currentMapName = "map1";
+    public string currentMapName;
 
     private string folderPath;
     private string currentNotePath;
 
     void Start()
     {
+        SetMap(PlayerPrefs.GetString("LastMapFolder", ""));
         InitializeNotes();
-
         noteEditor.onEndEdit.AddListener(delegate { SaveNote(); });
         titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
     }
@@ -43,7 +43,7 @@ public class NotesManager : MonoBehaviour
             Directory.CreateDirectory(folderPath);
         }
 
-        currentNotePath = null;
+
         noteEditor.text = "";
         titleEditor.text = "";
 
@@ -74,12 +74,23 @@ public class NotesManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(folderPath)) InitializeNotes();
 
-        string noteName = "UntitledNote_" + System.DateTime.Now.ToString("yyMMdd_HHmm");
-        string path = Path.Combine(folderPath, noteName + ".md");
+        int noteIndex = 0;
+        string fileName;
+        string fullPath;
 
-        File.WriteAllText(path, "# " + noteName);
+        do
+        {
+            fileName = "note" + noteIndex;
+            fullPath = Path.Combine(folderPath, fileName + ".md");
+            noteIndex++;
+        }
+        while (File.Exists(fullPath));
+
+
+        File.WriteAllText(fullPath, "# " + fileName);
+        
         LoadNotes();
-        OpenNote(path);
+        OpenNote(fullPath);
     }
 
     void OpenNote(string path)
@@ -116,7 +127,7 @@ public class NotesManager : MonoBehaviour
         {
             File.Delete(currentNotePath);
         }
-        currentNotePath = null;
+
         noteEditor.text = "";
         titleEditor.text = "";
         LoadNotes();
