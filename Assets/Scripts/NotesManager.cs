@@ -12,20 +12,42 @@ public class NotesManager : MonoBehaviour
     public TMP_InputField noteEditor;
     public TMP_InputField titleEditor;
 
+    [Header("Dynamic Map Settings")]
+    public string currentMapName = "map1";
+
     private string folderPath;
     private string currentNotePath;
 
     void Start()
     {
-        folderPath = Path.Combine(Application.persistentDataPath, "Notes");
-
-        if (!Directory.Exists(folderPath))
-            Directory.CreateDirectory(folderPath);
-
-        LoadNotes();
+        InitializeNotes();
 
         noteEditor.onEndEdit.AddListener(delegate { SaveNote(); });
         titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
+    }
+
+
+    public void SetMap(string newMapName)
+    {
+        currentMapName = newMapName;
+        InitializeNotes();
+    }
+
+    private void InitializeNotes()
+    {
+        string basePersistentPath = Application.persistentDataPath;
+        folderPath = Path.Combine(basePersistentPath, "maps", currentMapName, "Notes");
+
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        currentNotePath = null;
+        noteEditor.text = "";
+        titleEditor.text = "";
+
+        LoadNotes();
     }
 
     public void LoadNotes()
@@ -50,6 +72,8 @@ public class NotesManager : MonoBehaviour
 
     public void CreateNote()
     {
+        if (string.IsNullOrEmpty(folderPath)) InitializeNotes();
+
         string noteName = "UntitledNote_" + System.DateTime.Now.ToString("yyMMdd_HHmm");
         string path = Path.Combine(folderPath, noteName + ".md");
 
@@ -88,7 +112,10 @@ public class NotesManager : MonoBehaviour
     public void DeleteNote()
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
-        File.Delete(currentNotePath);
+        if (File.Exists(currentNotePath))
+        {
+            File.Delete(currentNotePath);
+        }
         currentNotePath = null;
         noteEditor.text = "";
         titleEditor.text = "";
