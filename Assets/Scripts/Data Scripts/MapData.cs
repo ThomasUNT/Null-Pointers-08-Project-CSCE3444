@@ -10,12 +10,14 @@ public class MapData
 [System.Serializable]
 public class MapSettings
 {
-    public float fontName;
+    public string fontName;
     public float mapScale;
+    public float mapZoom;
 
     public MapSettings()
     {
         this.fontName = "";
         this.mapScale = 0.5f;
+        this.mapZoom = 1f;
     }
 }
