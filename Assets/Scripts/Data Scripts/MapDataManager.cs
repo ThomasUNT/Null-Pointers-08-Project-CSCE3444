@@ -126,7 +126,8 @@ public class MapDataManager : MonoBehaviour
           tmp.font = font;
         }
       }
-        
+        // adding a return to prevent errors in the editor when trying to access the newest text's font before it's fully initialized
+        return textData;
     }
 
     private Sprite GetSpriteForType(string type)

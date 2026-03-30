@@ -19,6 +19,6 @@ public class UIController : MonoBehaviour
         Debug.Log("Text Place Mode: " + clickHandler.textPlaceMode);
     }
     public void OpenMapSettings(){
-      mapSettingPanel.OpenMapSettings();
+      mapSettingsPanel.OpenMapSettings();
     }
 }
