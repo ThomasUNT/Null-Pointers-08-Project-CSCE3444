@@ -568,6 +568,10 @@ MonoBehaviour:
   mapData:
     nodes: []
     mapTexts: []
+    mapSettings:
+      fontName: 
+      mapScale: 0.5
+      mapZoom: 1
   mapRect: {fileID: 1598337226}
   nodeIconPrefab: {fileID: 2296013802742988286, guid: f691fcf08bef4374e929675051b68cc2, type: 3}
   mapTextPrefab: {fileID: 1569003058668544401, guid: 62b7a4fa7f0d931469011fb8acdeec72, type: 3}
@@ -579,6 +583,7 @@ MonoBehaviour:
   citySprite: {fileID: 7961463184084027955, guid: b433ba0c30069ff42a46e176a11614a5, type: 3}
   majorCitySprite: {fileID: 784445518160936739, guid: f415eda48cdc8b243a03c42709ae5eac, type: 3}
   defaultSprite: {fileID: -3384411708189302445, guid: f00e6d63b2909b340aa3b07f92124efa, type: 3}
+  spawnedTexts: []
 --- !u!4 &55223474
 Transform:
   m_ObjectHideFlags: 0
@@ -2992,6 +2997,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIController
   clickHandler: {fileID: 2108143299}
+  mapSettingsPanel: {fileID: 0}
 --- !u!4 &263706680
 Transform:
   m_ObjectHideFlags: 0
@@ -6042,7 +6048,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 402.34457, y: -816.83093}
+  m_AnchoredPosition: {x: 373, y: -900.05304}
   m_SizeDelta: {x: 447.7, y: 114.9491}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &500355331
@@ -10474,7 +10480,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 402.34457, y: -490.24078}
+  m_AnchoredPosition: {x: 373, y: -540.1741}
   m_SizeDelta: {x: 447.58, y: 114.9194}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1020463725
@@ -14654,7 +14660,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 402.34457, y: -163.47655}
+  m_AnchoredPosition: {x: 373, y: -180.12099}
   m_SizeDelta: {x: 449.0487, y: 115.2972}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1467378415
