@@ -12,7 +12,16 @@ public class MapMaskManager : MonoBehaviour
 
     void Awake()
     {
-        filePath = Path.Combine(Application.persistentDataPath, "colorMask.png");
+        string folder = PlayerPrefs.GetString("LastMapFolder", "");
+
+        if (string.IsNullOrEmpty(folder))
+        {
+            Debug.LogError("No map folder set.");
+            return;
+        }
+
+        filePath = Path.Combine(folder, "colorMask.png");
+
         LoadOrCreateMask();
     }
 
