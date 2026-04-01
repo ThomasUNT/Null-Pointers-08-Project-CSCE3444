@@ -4098,7 +4098,7 @@ GameObject:
   - component: {fileID: 327704813}
   - component: {fileID: 327704812}
   m_Layer: 5
-  m_Name: Save
+  m_Name: Land Brush
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4167,19 +4167,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 327704813}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 263706681}
-        m_TargetAssemblyTypeName: NodeEditorUI, Assembly-CSharp
-        m_MethodName: saveTitleEditor
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &327704813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4410,7 +4398,7 @@ GameObject:
   - component: {fileID: 352305837}
   - component: {fileID: 352305836}
   m_Layer: 5
-  m_Name: Delete
+  m_Name: Water Brush
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4479,19 +4467,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 352305837}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 263706681}
-        m_TargetAssemblyTypeName: NodeEditorUI, Assembly-CSharp
-        m_MethodName: DeleteActiveText
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &352305837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4995,7 +4971,7 @@ GameObject:
   - component: {fileID: 416061949}
   - component: {fileID: 416061948}
   m_Layer: 5
-  m_Name: Font Size
+  m_Name: Brush Size
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5040,7 +5016,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Font Size
+  m_text: 'Brush Size
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7691,6 +7669,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 696760368}
   m_CullTransparentMesh: 1
+--- !u!1 &707691136
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 707691138}
+  - component: {fileID: 707691137}
+  m_Layer: 0
+  m_Name: MapMaskManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &707691137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707691136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 362df9a64f891e44fa846792b1b0d5d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapMaskManager
+  width: 1536
+  height: 1024
+  maskTexture: {fileID: 0}
+--- !u!4 &707691138
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707691136}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 415.21402, y: 182.76324, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &708374783
 GameObject:
   m_ObjectHideFlags: 0
@@ -10103,7 +10128,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Save
+  m_text: Land Brush
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -13095,7 +13120,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Delete
+  m_text: Water Brush
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -14267,7 +14292,7 @@ GameObject:
   - component: {fileID: 1341088723}
   - component: {fileID: 1341088725}
   m_Layer: 5
-  m_Name: Font Size
+  m_Name: Brush Size
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15468,8 +15493,8 @@ GameObject:
   - component: {fileID: 1598337226}
   - component: {fileID: 1598337229}
   - component: {fileID: 1598337228}
-  - component: {fileID: 1598337227}
   - component: {fileID: 1598337230}
+  - component: {fileID: 1598337231}
   m_Layer: 5
   m_Name: MapImage
   m_TagString: Untagged
@@ -15496,18 +15521,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0.1066, y: 1.0659}
   m_SizeDelta: {x: 1190.2288, y: 887.37}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1598337227
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1598337225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0242002e35edf9409dd5e4e39b135a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!114 &1598337228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15564,6 +15577,19 @@ MonoBehaviour:
   maxScale: 3
   mapRect: {fileID: 863549278}
   mapDataManager: {fileID: 55223473}
+--- !u!114 &1598337231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1598337225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9736b04097bc4f4cb7640b0ea273663, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DisplayMaskToUI
+  maskManager: {fileID: 707691137}
 --- !u!1 &1603861432
 GameObject:
   m_ObjectHideFlags: 0
@@ -15712,7 +15738,7 @@ GameObject:
   - component: {fileID: 1706143767}
   - component: {fileID: 1706143768}
   m_Layer: 5
-  m_Name: Font Size Slider
+  m_Name: Brush Size Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18979,3 +19005,4 @@ SceneRoots:
   - {fileID: 263706680}
   - {fileID: 2108143300}
   - {fileID: 55223474}
+  - {fileID: 707691138}
