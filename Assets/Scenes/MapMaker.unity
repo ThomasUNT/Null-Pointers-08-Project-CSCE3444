@@ -693,7 +693,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f07185afd30b6948be4857458c75fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SliderUI
-  sliderText: {fileID: 0}
+  sliderText: {fileID: 861919790}
 --- !u!1 &439455625
 GameObject:
   m_ObjectHideFlags: 0
