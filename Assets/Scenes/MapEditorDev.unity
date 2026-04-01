@@ -13568,6 +13568,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c8a8ede793f53d4596db56f6b635cd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DrawHandler
+  mapRect: {fileID: 1598337226}
+  maskManager: {fileID: 707691137}
   landMode: 0
   waterMode: 1
 --- !u!4 &1283519111
