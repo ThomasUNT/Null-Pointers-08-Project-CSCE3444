@@ -23,4 +23,5 @@ Recordings/
 *.VC.db
 *.vsidx
 *.vsconfig
+*.vscode
 /.vs
