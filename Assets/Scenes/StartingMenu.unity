@@ -1242,7 +1242,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee47d9113b3d39b4caf19017a32baca9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImportMapButton
-  sceneLoader: {fileID: 0}
+  sceneLoader: {fileID: 171137503}
   sceneToLoad: AddInfoNodes
 --- !u!4 &1694071051
 Transform:
