@@ -3,7 +3,6 @@ using UnityEngine;
 public class UIController : MonoBehaviour
 {
     public MapClickHandler clickHandler;
-    public MapSettingsPanel mapSettingsPanel;
 
     public void TogglePlaceMode()
     {
@@ -17,8 +16,5 @@ public class UIController : MonoBehaviour
         clickHandler.textPlaceMode = !clickHandler.textPlaceMode;
 
         Debug.Log("Text Place Mode: " + clickHandler.textPlaceMode);
-    }
-    public void OpenMapSettings(){
-      mapSettingsPanel.OpenMapSettings();
     }
 }
