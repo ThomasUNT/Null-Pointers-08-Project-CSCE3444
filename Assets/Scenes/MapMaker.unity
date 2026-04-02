@@ -226,22 +226,17 @@ MonoBehaviour:
   mapData:
     nodes: []
     mapTexts: []
-    mapSettings:
-      fontName: 
-      mapScale: 0.5
-      mapZoom: 1
   mapRect: {fileID: 1943488808}
   nodeIconPrefab: {fileID: 2296013802742988286, guid: f691fcf08bef4374e929675051b68cc2, type: 3}
-  mapTextPrefab: {fileID: 0}
-  editorUI: {fileID: 0}
+  mapTextPrefab: {fileID: 1569003058668544401, guid: 62b7a4fa7f0d931469011fb8acdeec72, type: 3}
+  editorUI: {fileID: 431206827}
   defaultNodeSizeMultiplier: 1
-  ruinsSprite: {fileID: 0}
-  villageSprite: {fileID: 0}
-  townSprite: {fileID: 0}
-  citySprite: {fileID: 0}
-  majorCitySprite: {fileID: 0}
-  defaultSprite: {fileID: 0}
-  spawnedTexts: []
+  ruinsSprite: {fileID: 2508076209106177942, guid: 8279b970d10204548b2c83cd2eaf7b60, type: 3}
+  villageSprite: {fileID: 3461850574408800985, guid: a6a0cf501d7c6fb4fbbb786f490fc1b8, type: 3}
+  townSprite: {fileID: -6470653568274419442, guid: 892819d8b0a73af45874333caec56e9b, type: 3}
+  citySprite: {fileID: 7961463184084027955, guid: b433ba0c30069ff42a46e176a11614a5, type: 3}
+  majorCitySprite: {fileID: 784445518160936739, guid: f415eda48cdc8b243a03c42709ae5eac, type: 3}
+  defaultSprite: {fileID: -3384411708189302445, guid: f00e6d63b2909b340aa3b07f92124efa, type: 3}
 --- !u!4 &28997794
 Transform:
   m_ObjectHideFlags: 0
@@ -686,7 +681,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIController
   clickHandler: {fileID: 1260302098}
-  mapSettingsPanel: {fileID: 0}
 --- !u!224 &431206829
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3695,16 +3689,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 431206830}
-        m_TargetAssemblyTypeName: MapEditorUI, Assembly-CSharp
-        m_MethodName: OpenButtonPanel
-        m_Mode: 1
+      - m_Target: {fileID: 309948907}
+        m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
+        m_MethodName: LoadScene
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: StartingMenu
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1199442855
