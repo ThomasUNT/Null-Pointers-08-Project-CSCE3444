@@ -22,8 +22,8 @@ public class MapDataManager : MonoBehaviour
     public Sprite majorCitySprite;
     public Sprite defaultSprite;
 
-/*    float maxZoom = 2.0f; // TEMP placeholder
-    float normalizedZoom = mapRect.localScale.x / maxZoom;*/
+    /*    float maxZoom = 2.0f; // TEMP placeholder
+        float normalizedZoom = mapRect.localScale.x / maxZoom;*/
 
 
     List<GameObject> spawnedIcons = new List<GameObject>();
@@ -84,6 +84,7 @@ public class MapDataManager : MonoBehaviour
         //Save();
         DrawMapTexts();
 
+        // adding a return to prevent errors in the editor when trying to access the newest text's font before it's fully initialized
         return textData;
     }
 
@@ -103,7 +104,7 @@ public class MapDataManager : MonoBehaviour
     public void DrawNodes()
     {
         float mapScale = mapRect.localScale.x;
-        
+
         // TEMPORARY
         float minZoom = 1f;
         float maxZoom = 3f;
@@ -156,7 +157,7 @@ public class MapDataManager : MonoBehaviour
         // clear old texts
         foreach (var textObj in spawnedTexts)
             DestroyImmediate(textObj);
-        
+
         spawnedTexts.Clear();
 
         Rect rect = mapRect.rect;
@@ -197,7 +198,7 @@ public class MapDataManager : MonoBehaviour
             tmp.fontSize = textData.fontSize;
 
             // Rotation
-            textObj.transform.localRotation = Quaternion.Euler(0,0, textData.rotation);
+            textObj.transform.localRotation = Quaternion.Euler(0, 0, textData.rotation);
 
             // Arc
             CurvedText curved = textObj.GetComponent<CurvedText>();
