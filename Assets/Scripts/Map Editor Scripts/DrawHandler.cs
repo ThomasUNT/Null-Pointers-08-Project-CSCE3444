@@ -32,11 +32,17 @@ public class MapDrawHandler : MonoBehaviour
     {
         // Convert Screen position to Local UI space
         if (!TryGetLocalPoint(screenPosition, out Vector2 localPoint))
+        {
+            lastPixelPos = null;
             return;
+        }
 
         // Convert Local point to normalized 0 - 1 range
         if (!TryGetNormalizedPoint(localPoint, out Vector2 normalizedPoint))
+        {
+            lastPixelPos = null;
             return;
+        }
 
         // Draw on texture
         DrawPixel(normalizedPoint);
