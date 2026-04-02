@@ -22,12 +22,12 @@ public class MapDataManager : MonoBehaviour
     public Sprite majorCitySprite;
     public Sprite defaultSprite;
 
-/*    float maxZoom = 2.0f; // TEMP placeholder
-    float normalizedZoom = mapRect.localScale.x / maxZoom;*/
+    /*    float maxZoom = 2.0f; // TEMP placeholder
+        float normalizedZoom = mapRect.localScale.x / maxZoom;*/
 
 
-     List<GameObject> spawnedIcons = new List<GameObject>();
-    public List<GameObject> spawnedTexts = new List<GameObject>();
+    List<GameObject> spawnedIcons = new List<GameObject>();
+    List<GameObject> spawnedTexts = new List<GameObject>();
 
     void Start()
     {
@@ -113,19 +113,7 @@ public class MapDataManager : MonoBehaviour
         mapData.mapTexts.Add(textData);
         //Save();
         DrawMapTexts();
-        
-    string savedFont = mapData.mapSettings.fontName;
-    if (!string.IsNullOrEmpty(savedFont))
-    {
-       TMPro.TMP_FontAsset font = Resources.Load<TMPro.TMP_FontAsset>("Fonts/" + savedFont);
-       if (font != null)
-       {
-       GameObject newest = spawnedTexts[spawnedTexts.Count - 1];
-       TMPro.TMP_Text tmp = newest.GetComponent<TMPro.TMP_Text>();
-       if(tmp != null)
-          tmp.font = font;
-        }
-      }
+
         // adding a return to prevent errors in the editor when trying to access the newest text's font before it's fully initialized
         return textData;
     }
@@ -146,7 +134,7 @@ public class MapDataManager : MonoBehaviour
     public void DrawNodes()
     {
         float mapScale = mapRect.localScale.x;
-        
+
         // TEMPORARY
         float minZoom = 1f;
         float maxZoom = 3f;
@@ -199,7 +187,7 @@ public class MapDataManager : MonoBehaviour
         // clear old texts
         foreach (var textObj in spawnedTexts)
             DestroyImmediate(textObj);
-        
+
         spawnedTexts.Clear();
 
         Rect rect = mapRect.rect;
@@ -240,7 +228,7 @@ public class MapDataManager : MonoBehaviour
             tmp.fontSize = textData.fontSize;
 
             // Rotation
-            textObj.transform.localRotation = Quaternion.Euler(0,0, textData.rotation);
+            textObj.transform.localRotation = Quaternion.Euler(0, 0, textData.rotation);
 
             // Arc
             CurvedText curved = textObj.GetComponent<CurvedText>();
@@ -292,5 +280,4 @@ public class MapDataManager : MonoBehaviour
             mapData = JsonUtility.FromJson<MapData>(json);
         }
     }
-    
- }
+}
