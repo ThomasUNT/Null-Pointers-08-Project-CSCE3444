@@ -53,7 +53,7 @@ public class MapMaskManager : MonoBehaviour
         maskTexture.Apply();
     }
 
-    void SaveMask()
+    public void SaveMask()
     {
         byte[] pngData = maskTexture.EncodeToPNG();
         File.WriteAllBytes(filePath, pngData);
