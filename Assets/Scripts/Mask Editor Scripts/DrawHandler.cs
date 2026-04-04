@@ -102,6 +102,10 @@ public class MapDrawHandler : MonoBehaviour
         // Determine color based on mode
         Color32 color = Color.white;
 
+        Color32[] pixels = tex.GetPixels32();
+        int width = tex.width;
+        int height = tex.height;
+
         if (landMode)
             color = Color.black;
         else if (waterMode)
@@ -110,18 +114,21 @@ public class MapDrawHandler : MonoBehaviour
         // If we have previous pixel, draw a line to avoid gaps
         if (lastPixelPos.HasValue)
         {
-            DrawLine(tex, lastPixelPos.Value, current, color);
+            DrawLine(pixels, width, height, lastPixelPos.Value, current, color);
         }
         else        {
-            DrawBrush(tex, px, py, color);
+            DrawBrush(pixels, width, height, px, py, color);
         }
+
+        // Apply modified pixels back to texture
+        tex.SetPixels32(pixels);
 
         // Store current pixel as last pixel for next frame
         lastPixelPos = current;
     }
 
     // Draws a line between two points
-    void DrawLine(Texture2D tex, Vector2 from, Vector2 to, Color32 color)
+    void DrawLine(Color32[] pixels, int width, int height, Vector2 from, Vector2 to, Color32 color)
     {
         // Number of steps based on distance between points
         int steps = Mathf.CeilToInt(Vector2.Distance(from, to));
@@ -134,27 +141,33 @@ public class MapDrawHandler : MonoBehaviour
             int x = Mathf.RoundToInt(Mathf.Lerp(from.x, to.x, t));
             int y = Mathf.RoundToInt(Mathf.Lerp(from.y, to.y, t));
 
-            DrawBrush(tex, x, y, color);
+            DrawBrush(pixels, width, height, x, y, color);
         }
     }
 
-    void DrawBrush(Texture2D tex, int cx, int cy, Color32 color)
+    void DrawBrush(Color32[] pixels, int width, int height, int cx, int cy, Color32 color)
     {
+        int radiusSq = brushSize * brushSize;
+
         for (int x = -brushSize; x <= brushSize; x++)
         {
             for (int y = -brushSize; y <= brushSize; y++)
             {
-                if (x * x + y * y > brushSize * brushSize)
+                if (x * x + y * y > radiusSq)
                     continue; // Skip pixels outside the circular brush
 
                 int px = cx + x;
                 int py = cy + y;
 
-                // Check bounds
-                if (px >= 0 && px < tex.width && py >= 0 && py < tex.height)
-                {
-                    tex.SetPixel(px, py, color);
-                }
+                if (px < 0 || px >= width || py < 0 || py >= height)
+                    continue; // Skip pixels outside texture bounds
+
+                int index = py * width + px;
+
+                if (pixels[index].Equals(color))
+                    continue; // Skip if pixel already has the target color
+
+                pixels[index] = color;
             }
         }
     }
