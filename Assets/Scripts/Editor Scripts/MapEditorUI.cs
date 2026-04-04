@@ -7,6 +7,10 @@ public class MapEditorUI : MonoBehaviour
     public GameObject biomesPanel;
     public GameObject buttonPanel;
     public GameObject leftPanel;
+
+    public SliderUI startPanelSlider;
+    public SliderUI biomePanelSlider;
+
     public MapDataManager dataManager;
 
 
@@ -14,12 +18,16 @@ public class MapEditorUI : MonoBehaviour
     {
         startPanel.SetActive(false);
         biomesPanel.SetActive(true);
+
+        biomePanelSlider.RefreshFromSource();
     }
 
     public void OpenStartPanel()
     {
         startPanel.SetActive(true);
         biomesPanel.SetActive(false);
+
+        startPanelSlider.RefreshFromSource();
     }
 
     public void OpenButtonPanel()

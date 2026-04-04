@@ -5,6 +5,9 @@ public class MapDrawHandler : MonoBehaviour
     public RectTransform mapRect;
     public MapMaskManager maskManager;
 
+    [Range(1, 50)]
+    public int brushSize = 4;
+
     public bool landMode = false;
     public bool waterMode = false;
 
@@ -46,6 +49,11 @@ public class MapDrawHandler : MonoBehaviour
 
         // Draw on texture
         DrawPixel(normalizedPoint);
+    }
+
+    public void SetBrushSize(float value)
+    {
+        brushSize = Mathf.RoundToInt(value);
     }
 
     // Converts screen position to local position within the mapRect
@@ -103,7 +111,7 @@ public class MapDrawHandler : MonoBehaviour
             DrawLine(tex, lastPixelPos.Value, current, color);
         }
         else        {
-            tex.SetPixel(px, py, color);
+            DrawBrush(tex, px, py, color);
         }
 
         // Store current pixel as last pixel for next frame
@@ -126,7 +134,28 @@ public class MapDrawHandler : MonoBehaviour
             int x = Mathf.RoundToInt(Mathf.Lerp(from.x, to.x, t));
             int y = Mathf.RoundToInt(Mathf.Lerp(from.y, to.y, t));
 
-            tex.SetPixel(x, y, color);
+            DrawBrush(tex, x, y, color);
+        }
+    }
+
+    void DrawBrush(Texture2D tex, int cx, int cy, Color32 color)
+    {
+        for (int x = -brushSize; x <= brushSize; x++)
+        {
+            for (int y = -brushSize; y <= brushSize; y++)
+            {
+                if (x * x + y * y > brushSize * brushSize)
+                    continue; // Skip pixels outside the circular brush
+
+                int px = cx + x;
+                int py = cy + y;
+
+                // Check bounds
+                if (px >= 0 && px < tex.width && py >= 0 && py < tex.height)
+                {
+                    tex.SetPixel(px, py, color);
+                }
+            }
         }
     }
 
