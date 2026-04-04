@@ -28,6 +28,8 @@ public class MapDrawHandler : MonoBehaviour
         if (Input.GetMouseButton(0) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
         {
             HandleDraw(Input.mousePosition);
+
+            maskManager.maskTexture.Apply(); // Apply changes to texture after drawing
         }
     }
 
@@ -116,8 +118,6 @@ public class MapDrawHandler : MonoBehaviour
 
         // Store current pixel as last pixel for next frame
         lastPixelPos = current;
-
-        tex.Apply();
     }
 
     // Draws a line between two points
