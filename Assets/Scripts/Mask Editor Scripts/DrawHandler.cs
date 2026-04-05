@@ -10,6 +10,10 @@ public class MapDrawHandler : MonoBehaviour
 
     public bool landMode = false;
     public bool waterMode = false;
+    public bool forestMode = false;
+    public bool mountainMode = false;
+    public bool tundraMode = false;
+    public bool desertMode = false;
 
     private Vector2? lastPixelPos = null;
 
@@ -110,13 +114,22 @@ public class MapDrawHandler : MonoBehaviour
             color = Color.black;
         else if (waterMode)
             color = Color.white;
+        else if (forestMode)
+            color = Color.green;
+        else if (mountainMode)
+            color = Color.red;
+        else if (tundraMode)
+            color = Color.gray;
+        else if (desertMode)
+            color = Color.yellow;
 
         // If we have previous pixel, draw a line to avoid gaps
         if (lastPixelPos.HasValue)
         {
             DrawLine(pixels, width, height, lastPixelPos.Value, current, color);
         }
-        else        {
+        else
+        {
             DrawBrush(pixels, width, height, px, py, color);
         }
 
