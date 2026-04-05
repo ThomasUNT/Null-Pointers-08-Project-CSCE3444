@@ -648,6 +648,10 @@ MonoBehaviour:
   brushSize: 4
   landMode: 0
   waterMode: 0
+  forestMode: 0
+  mountainMode: 0
+  tundraMode: 0
+  desertMode: 0
 --- !u!4 &364649625
 Transform:
   m_ObjectHideFlags: 0
@@ -2358,7 +2362,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 861685749}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 364649624}
+        m_TargetAssemblyTypeName: MapDrawHandler, Assembly-CSharp
+        m_MethodName: ToggleMountainMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &861685749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3476,7 +3492,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1154423403}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 364649624}
+        m_TargetAssemblyTypeName: MapDrawHandler, Assembly-CSharp
+        m_MethodName: ToggleForestMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1154423403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4162,7 +4190,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1260343716}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 364649624}
+        m_TargetAssemblyTypeName: MapDrawHandler, Assembly-CSharp
+        m_MethodName: ToggleTundraMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1260343716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5344,7 +5384,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1579977065}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 364649624}
+        m_TargetAssemblyTypeName: MapDrawHandler, Assembly-CSharp
+        m_MethodName: ToggleDesertMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1579977065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6717,7 +6769,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1904897969}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 364649624}
+        m_TargetAssemblyTypeName: MapDrawHandler, Assembly-CSharp
+        m_MethodName: ToggleLandMode
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1904897969
 MonoBehaviour:
   m_ObjectHideFlags: 0

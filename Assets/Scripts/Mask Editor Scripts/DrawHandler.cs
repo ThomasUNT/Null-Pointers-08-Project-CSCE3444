@@ -20,7 +20,8 @@ public class MapDrawHandler : MonoBehaviour
     void Update()
     {
         // Do nothing if neither mode is active
-        if (!landMode && !waterMode) return;
+        if (!landMode && !waterMode && !forestMode && !mountainMode && !tundraMode && !desertMode)
+            return;
 
         // When mouse is released, stop connecting pixels
         if (Input.GetMouseButtonUp(0))
@@ -187,17 +188,47 @@ public class MapDrawHandler : MonoBehaviour
 
     public void ToggleLandMode()
     {
-        landMode = !landMode;
-        waterMode = false; // Ensure water mode is off when land mode is toggled on
-
-        Debug.Log("Land Mode: " + landMode);
+        ResetModes();
+        landMode = true;
     }
 
     public void ToggleWaterMode()
     {
-        waterMode = !waterMode;
-        landMode = false; // Ensure land mode is off when water mode is toggled on
+        ResetModes();
+        waterMode = true;
+    }
 
-        Debug.Log("Water Mode: " + waterMode);
+    public void ToggleForestMode()
+    {
+        ResetModes();
+        forestMode = true;
+    }
+
+    public void ToggleMountainMode()
+        {
+            ResetModes();
+            mountainMode = true;
+    }
+
+    public void ToggleTundraMode()
+    {
+        ResetModes();
+        tundraMode = true;
+    }
+
+    public void ToggleDesertMode()
+    {
+        ResetModes();
+        desertMode = true;
+    }
+
+    public void ResetModes()
+    {
+        landMode = false;
+        waterMode = false;
+        forestMode = false;
+        mountainMode = false;
+        tundraMode = false;
+        desertMode = false;
     }
 }
