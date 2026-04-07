@@ -87,8 +87,8 @@ public class NotesManager : MonoBehaviour
         while (File.Exists(fullPath));
 
 
-        File.WriteAllText(fullPath, "# " + fileName);
         
+        currentNotePath = fullPath;
         LoadNotes();
         OpenNote(fullPath);
     }
