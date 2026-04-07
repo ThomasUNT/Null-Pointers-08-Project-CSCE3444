@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MapCursorManager : MonoBehaviour
+public class CursorManager : MonoBehaviour
 {
     [Header("References")]
     public MapDrawHandler drawHandler;
     public RectTransform brushPreview; // Cursor image
+    public RectTransform mapWindow;
     public Image previewImage; // To toggle visibility
 
     private RectTransform canvasRect;
@@ -21,7 +22,7 @@ public class MapCursorManager : MonoBehaviour
         Vector2 localPoint;
         // Convert mouse position to a point relative to the Map
         bool isOverMap = RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            drawHandler.mapRect,
+            mapWindow,
             Input.mousePosition,
             null,
             out localPoint
