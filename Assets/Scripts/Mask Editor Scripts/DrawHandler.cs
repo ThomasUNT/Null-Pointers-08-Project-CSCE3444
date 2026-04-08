@@ -15,7 +15,16 @@ public class MapDrawHandler : MonoBehaviour
     public bool tundraMode = false;
     public bool desertMode = false;
 
+    public bool pixelsSet = false;
+
+    public Texture2D tex;
+    public Color32[] pixels;
     private Vector2? lastPixelPos = null;
+
+    void Start()
+    {
+        tex = maskManager.maskTexture;
+    }
 
     void Update()
     {
@@ -27,6 +36,7 @@ public class MapDrawHandler : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             lastPixelPos = null;
+            pixelsSet = false;
         }
 
         if (Input.GetKey(KeyCode.Escape))
@@ -38,9 +48,15 @@ public class MapDrawHandler : MonoBehaviour
         // While mouse is held, continuously draw and connect pixels
         if (Input.GetMouseButton(0) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
         {
+            if (!pixelsSet)
+            {
+                pixels = tex.GetPixels32();
+                pixelsSet = true;
+            }
             HandleDraw(Input.mousePosition);
 
-            maskManager.maskTexture.Apply(); // Apply changes to texture after drawing
+            tex.SetPixels32(pixels);
+            tex.Apply(); // Apply changes to texture after drawing
         }
     }
 
@@ -98,8 +114,6 @@ public class MapDrawHandler : MonoBehaviour
 
     private void DrawPixel(Vector2 normalizedPoint)
     {
-        Texture2D tex = maskManager.maskTexture;
-
         // Convert normalized coordinates to pixel coordinates
         int px = Mathf.FloorToInt(normalizedPoint.x * tex.width);
         int py = Mathf.FloorToInt(normalizedPoint.y * tex.height);
@@ -113,7 +127,6 @@ public class MapDrawHandler : MonoBehaviour
         // Determine color based on mode
         Color32 color = Color.white;
 
-        Color32[] pixels = tex.GetPixels32();
         int width = tex.width;
         int height = tex.height;
 
@@ -139,9 +152,6 @@ public class MapDrawHandler : MonoBehaviour
         {
             DrawBrush(pixels, width, height, px, py, color);
         }
-
-        // Apply modified pixels back to texture
-        tex.SetPixels32(pixels);
 
         // Store current pixel as last pixel for next frame
         lastPixelPos = current;

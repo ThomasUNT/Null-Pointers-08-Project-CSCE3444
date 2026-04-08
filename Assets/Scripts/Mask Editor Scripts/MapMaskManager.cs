@@ -42,6 +42,10 @@ public class MapMaskManager : MonoBehaviour
     {
         maskTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
 
+        maskTexture.filterMode = FilterMode.Point;
+        maskTexture.anisoLevel = 0;
+        maskTexture.wrapMode = TextureWrapMode.Clamp;
+
         Color32[] pixels = new Color32[width * height];
 
         for (int i = 0; i < pixels.Length; i++)
@@ -64,6 +68,11 @@ public class MapMaskManager : MonoBehaviour
         byte[] fileData = File.ReadAllBytes(filePath);
 
         maskTexture = new Texture2D(2, 2);
+
+        maskTexture.filterMode = FilterMode.Point;
+        maskTexture.anisoLevel = 0;
+        maskTexture.wrapMode = TextureWrapMode.Clamp;
+
         maskTexture.LoadImage(fileData);
     }
 }
