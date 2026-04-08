@@ -76,3 +76,30 @@ public class MapMaskManager : MonoBehaviour
         maskTexture.LoadImage(fileData);
     }
 }
+
+/*public static class MapBridge
+{
+    // Unity -> Library
+    public static void UpdateLibraryFromUnity(Color32[] unityPixels, ImageData libData)
+    {
+        for (int i = 0; i < unityPixels.Length; i++)
+        {
+            libData.Pixels[i].R = unityPixels[i].r;
+            libData.Pixels[i].G = unityPixels[i].g;
+            libData.Pixels[i].B = unityPixels[i].b;
+            libData.Pixels[i].A = unityPixels[i].a;
+        }
+    }
+
+    // Library -> Unity
+    public static void UpdateUnityFromLibrary(ImageData libData, Color32[] unityPixels)
+    {
+        for (int i = 0; i < unityPixels.Length; i++)
+        {
+            unityPixels[i].r = libData.Pixels[i].R;
+            unityPixels[i].g = libData.Pixels[i].G;
+            unityPixels[i].b = libData.Pixels[i].B;
+            unityPixels[i].a = libData.Pixels[i].A;
+        }
+    }
+}*/
