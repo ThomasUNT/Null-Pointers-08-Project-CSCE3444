@@ -29,7 +29,7 @@ public class CursorManager : MonoBehaviour
         );
 
         // Check if cursor is actually inside the map bounds
-        if (isOverMap && drawHandler.mapRect.rect.Contains(localPoint))
+        if (isOverMap && drawHandler.mapRect.rect.Contains(localPoint) && CheckDrawModes())
         {
             Cursor.visible = false; // Hide the standard system cursor
             previewImage.enabled = true;
@@ -39,6 +39,19 @@ public class CursorManager : MonoBehaviour
         {
             Cursor.visible = true; // Show standard cursor when outside
             previewImage.enabled = false;
+        }
+    }
+
+    bool CheckDrawModes()
+    {
+        if (drawHandler.landMode || drawHandler.waterMode || drawHandler.forestMode ||
+            drawHandler.mountainMode || drawHandler.tundraMode || drawHandler.desertMode)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -56,7 +69,7 @@ public class CursorManager : MonoBehaviour
 
         // Calculate Size
         float currentScale = drawHandler.mapRect.localScale.x;
-        float scaledSize = drawHandler.brushSize * currentScale;
+        float scaledSize = drawHandler.brushSize * currentScale * 1.6f;
 
         brushPreview.sizeDelta = new Vector2(scaledSize, scaledSize);
     }

@@ -29,6 +29,12 @@ public class MapDrawHandler : MonoBehaviour
             lastPixelPos = null;
         }
 
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            ResetModes();
+            return;
+        }
+
         // While mouse is held, continuously draw and connect pixels
         if (Input.GetMouseButton(0) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
         {
