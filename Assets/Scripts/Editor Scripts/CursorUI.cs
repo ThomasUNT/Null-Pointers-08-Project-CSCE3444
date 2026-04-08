@@ -1,26 +1,76 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CursorManager : MonoBehaviour
 {
-    public Texture2D cursorTexture; // Assign your "Cursor" type texture here
-    public Vector2 hotSpot = Vector2.zero; // The clickable point (0,0 is top-left)
-    public CursorMode cursorMode = CursorMode.Auto;
+    [Header("References")]
+    public MapDrawHandler drawHandler;
+    public RectTransform brushPreview; // Cursor image
+    public RectTransform mapWindow;
+    public Image previewImage; // To toggle visibility
+
+    private RectTransform canvasRect;
 
     void Start()
     {
-        // Set the custom cursor when the game starts
-        Cursor.SetCursor(cursorTexture, hotSpot, cursorMode);
+        canvasRect = brushPreview.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
+        previewImage = brushPreview.GetComponent<Image>();
     }
 
-    // Example: Change cursor on hover (requires a Collider and this script on the target)
-    void OnMouseEnter()
+    void Update()
     {
-        Cursor.SetCursor(cursorTexture, hotSpot, cursorMode);
+        Vector2 localPoint;
+        // Convert mouse position to a point relative to the Map
+        bool isOverMap = RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            mapWindow,
+            Input.mousePosition,
+            null,
+            out localPoint
+        );
+
+        // Check if cursor is actually inside the map bounds
+        if (isOverMap && drawHandler.mapRect.rect.Contains(localPoint) && CheckDrawModes())
+        {
+            Cursor.visible = false; // Hide the standard system cursor
+            previewImage.enabled = true;
+            UpdateBrushVisuals();
+        }
+        else
+        {
+            Cursor.visible = true; // Show standard cursor when outside
+            previewImage.enabled = false;
+        }
     }
 
-    void OnMouseExit()
+    bool CheckDrawModes()
     {
-        // Reset to default
-        Cursor.SetCursor(null, Vector2.zero, cursorMode);
+        if (drawHandler.landMode || drawHandler.waterMode || drawHandler.forestMode ||
+            drawHandler.mountainMode || drawHandler.tundraMode || drawHandler.desertMode)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    void UpdateBrushVisuals()
+    {
+        // Follow the mouse
+        Vector2 mousePos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect,
+            Input.mousePosition,
+            null,
+            out mousePos
+        );
+        brushPreview.anchoredPosition = mousePos;
+
+        // Calculate Size
+        float currentScale = drawHandler.mapRect.localScale.x;
+        float scaledSize = drawHandler.brushSize * currentScale * 1.6f;
+
+        brushPreview.sizeDelta = new Vector2(scaledSize, scaledSize);
     }
 }
