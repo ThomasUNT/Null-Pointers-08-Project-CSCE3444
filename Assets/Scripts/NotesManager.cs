@@ -86,8 +86,8 @@ public class NotesManager : MonoBehaviour
         }
         while (File.Exists(fullPath));
 
+        File.WriteAllText(fullPath, ""); // Create empty note file
 
-        
         currentNotePath = fullPath;
         LoadNotes();
         OpenNote(fullPath);
