@@ -4,6 +4,7 @@ public class SwitchToMapMenu : MonoBehaviour
 {
     public GameObject mainMenuCanvas;
     public GameObject openMapCanvas;
+    public MapSavePreviewManager previewManager;
 
     void Awake()
     {
@@ -21,5 +22,6 @@ public class SwitchToMapMenu : MonoBehaviour
     {
         mainMenuCanvas.SetActive(false);
         openMapCanvas.SetActive(true);
+        previewManager.ResetPreview();
     }
 }

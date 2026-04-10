@@ -6,6 +6,7 @@ public class MapOpenEntryAdder : MonoBehaviour
 {
     public GameObject saveEntryContainer;
     public GameObject saveEntryPrefab;
+    public MapSavePreviewManager PreviewManager;
 
     private List<GameObject> saveEntries = new List<GameObject>();
 
@@ -47,7 +48,9 @@ public class MapOpenEntryAdder : MonoBehaviour
             RectTransform entryRectTransform = newEntry.transform.GetComponent<RectTransform>();
             entryRectTransform.SetInsetAndSizeFromParentEdge(RectTransform.Edge.Top, entryTopPadding + entryPlusPaddingHeight * entryIdx, entryHeight);
 
-            newEntry.GetComponent<OpenSave>().SetPath(targetFolder);
+            OpenSave entryOpenSave = newEntry.GetComponent<OpenSave>();
+            entryOpenSave.SetPath(targetFolder);
+            entryOpenSave.PreviewManager = PreviewManager;
 
             saveEntries.Add(newEntry);
         }
