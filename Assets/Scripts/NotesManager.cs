@@ -3,6 +3,8 @@ using TMPro;
 using UnityEngine.UI;
 using System.IO;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
+using System.Text.RegularExpressions;
 
 public class NotesManager : MonoBehaviour
 {
@@ -12,6 +14,9 @@ public class NotesManager : MonoBehaviour
     public TMP_InputField noteEditor;
     public TMP_InputField titleEditor;
 
+    [Header("Ribbon Tools")]
+    public Color highlightColor = Color.yellow; //Default highlight color for ribbon tools
+
     [Header("Dynamic Map Settings")]
     public string currentMapName;
 
@@ -20,12 +25,79 @@ public class NotesManager : MonoBehaviour
 
     void Start()
     {
+        noteEditor.richText = true; //Allows rich text formatting
+
         SetMap(PlayerPrefs.GetString("LastMapFolder", ""));
         InitializeNotes();
         noteEditor.onEndEdit.AddListener(delegate { SaveNote(); });
         titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
     }
 
+    public void FormatBold() => ApplyTag("<b>", "</b>");
+    public void FormatItalic() => ApplyTag("<i>", "</i>");
+    public void FormatUnderline() => ApplyTag("<u>", "</u>");
+    public void FormatResize(float size) => ApplyTag($"<size={size}>", "</size>");
+
+    public void FormatColor(Color color)
+    {
+        string hex = ColorUtility.ToHtmlStringRGB(color);
+        ApplyTag($"<color=#{hex}>", "</color>");
+    }
+
+    private void ApplyTag(string open, string close)
+    {
+        int start = Mathf.Min(noteEditor.selectionStringAnchorPosition, noteEditor.selectionStringFocusPosition);
+        int end = Mathf.Max(noteEditor.selectionStringAnchorPosition, noteEditor.selectionStringFocusPosition);
+
+        if (start == end) return; //No highlighted text
+
+        string originalText = noteEditor.text;
+        string selectedText = originalText.Substring(start, end - start);
+        string formattedText;
+
+        if (selectedText.StartsWith(open) && selectedText.EndsWith(close))
+        {
+            formattedText = selectedText.Substring(open.Length, selectedText.Length - (open.Length + close.Length));
+        }
+        else
+        {
+            formattedText = $"{open}{selectedText}{close}";
+        }
+
+        noteEditor.text = originalText.Remove(start, end - start).Insert(start, formattedText); //Replace with formatted text
+
+        noteEditor.ActivateInputField();
+
+        noteEditor.selectionStringAnchorPosition = start;
+        noteEditor.selectionStringAnchorPosition = start + formattedText.Length;
+
+        SaveNote(); //Auto-save after formatting
+    }
+    //CLEAR FORMATTING BUTTON
+    public void ClearSelectedFormatting()
+    {
+        int start = Mathf.Min(noteEditor.selectionStringAnchorPosition, noteEditor.selectionStringFocusPosition);
+        int end = Mathf.Max(noteEditor.selectionStringAnchorPosition, noteEditor.selectionStringFocusPosition);
+
+        if (start == end) return; // No text selected to clear
+
+        string text = noteEditor.text;
+        string selectedText = text.Substring(start, end - start);
+
+        // Regex explanation: 
+        // <[^>]*> matches anything starting with <, ending with >, 
+        // and containing any characters except > in between.
+        string plainText = Regex.Replace(selectedText, "<[^>]*>", string.Empty);
+
+        noteEditor.text = text.Remove(start, end - start).Insert(start, plainText);
+
+        // Refocus and keep the now-plain text highlighted
+        noteEditor.ActivateInputField();
+        noteEditor.selectionStringAnchorPosition = start;
+        noteEditor.selectionStringFocusPosition = start + plainText.Length;
+
+        SaveNote();
+    }
 
     public void SetMap(string newMapName)
     {
