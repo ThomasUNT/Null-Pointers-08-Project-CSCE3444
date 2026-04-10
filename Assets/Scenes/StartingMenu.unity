@@ -1408,7 +1408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImportMapButton
   sceneLoader: {fileID: 171137503}
-  sceneToLoad: AddInfoNodes
+  sceneToLoad: MapViewer
 --- !u!4 &1694071051
 Transform:
   m_ObjectHideFlags: 0

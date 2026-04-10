@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/DMNotesScene.unity
     guid: 595ac4f74560a524797cf51407535889
+  - enabled: 1
+    path: Assets/Scenes/MapViewer.unity
+    guid: 89124bff0c24cb1448d1f77bd0d5e6cf
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

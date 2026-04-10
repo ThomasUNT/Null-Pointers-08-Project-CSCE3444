@@ -5,7 +5,7 @@ using SFB;
 public class ImportMapButton : MonoBehaviour
 {
     public SceneLoader sceneLoader;
-    public string sceneToLoad = "AddInfoNodes";
+    public string sceneToLoad = "MapViewer";
 
     public void ImportMap()
     {
