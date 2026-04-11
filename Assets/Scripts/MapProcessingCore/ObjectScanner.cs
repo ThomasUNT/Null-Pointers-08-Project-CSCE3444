@@ -35,8 +35,8 @@ public class ObjectScanner
                 if (IsForest(p))
                 {
                     // 1. Core Top/Bottom checks
-                    bool isTop = (y > 0 && !IsForest(pixels[(y + 1) * w + x]));
-                    bool isBottom = (y < h - 1 && !IsForest(pixels[(y - 1) * w + x]));
+                    bool isTop = (y == h - 1) || !IsForest(pixels[(y + 1) * w + x]);
+                    bool isBottom = (y == 0) || !IsForest(pixels[(y - 1) * w + x]);
 
                     // 2. Identify "True Vertical" Sides
                     bool isSide = false;
@@ -49,13 +49,13 @@ public class ObjectScanner
                         if (hasVerticalContinuity)
                         {
                             // Check Left Void (Top-Left, Left, Bottom-Left)
-                            bool leftVoid = (x > 0) &&
+                            bool leftVoid = (x == 0) ||
                                 (y > 0 && !IsForest(pixels[(y - 1) * w + (x - 1)])) &&
                                 (!IsForest(pixels[y * w + (x - 1)])) &&
                                 (y < h - 1 && !IsForest(pixels[(y + 1) * w + (x - 1)]));
 
                             // Check Right Void (Top-Right, Right, Bottom-Right)
-                            bool rightVoid = (x < w - 1) &&
+                            bool rightVoid = (x == w - 1) ||
                                 (y > 0 && !IsForest(pixels[(y - 1) * w + (x + 1)])) &&
                                 (!IsForest(pixels[y * w + (x + 1)])) &&
                                 (y < h - 1 && !IsForest(pixels[(y + 1) * w + (x + 1)]));
