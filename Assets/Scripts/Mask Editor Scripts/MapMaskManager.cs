@@ -1,5 +1,7 @@
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
+using MapProcessing.Core;
 
 public class MapMaskManager : MonoBehaviour
 {
