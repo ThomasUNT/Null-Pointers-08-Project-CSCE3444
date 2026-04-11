@@ -7,6 +7,7 @@ public class ObjectScanner
     public List<MapObject> DepthObjects = new List<MapObject>();
 
     public float mountainScale = 1.0f;
+    public float mountainDensity = 1.0f;
 
     public void Scan(ImageData mask, float[,] internalDist)
     {
@@ -34,8 +35,8 @@ public class ObjectScanner
                 if (IsForest(p))
                 {
                     // 1. Core Top/Bottom checks
-                    bool isTop = (y > 0 && !IsForest(pixels[(y - 1) * w + x]));
-                    bool isBottom = (y < h - 1 && !IsForest(pixels[(y + 1) * w + x]));
+                    bool isTop = (y > 0 && !IsForest(pixels[(y + 1) * w + x]));
+                    bool isBottom = (y < h - 1 && !IsForest(pixels[(y - 1) * w + x]));
 
                     // 2. Identify "True Vertical" Sides
                     bool isSide = false;
@@ -66,11 +67,11 @@ public class ObjectScanner
                     // 3. PLACEMENT LOGIC
                     // Use x % 5 for horizontals, and y % 5 for verticals to ensure 
                     // vertical walls get trees even if their X coordinate doesn't hit the modulo.
-                    if (isTop && x % 6 == 0)
+                    if (isTop && x % 7 == 0)
                     {
                         TopTrees.Add(new MapObject { X = x, Y = y });
                     }
-                    else if ((isBottom && x % 6 == 0) || (isSide && y % 6 == 0))
+                    else if ((isBottom && x % 7 == 0) || (isSide && y % 7 == 0))
                     {
                         DepthObjects.Add(new MapObject
                         {
@@ -84,7 +85,7 @@ public class ObjectScanner
                 else if (IsMountain(p))
                 {
                     // 1. Define the cell size based on scale (e.g., 20-30 pixels)
-                    int cellSize = (int)(22 * mountainScale);
+                    int cellSize = (int)((30 - (10 * mountainDensity)) * mountainScale);
                     if (cellSize < 10) cellSize = 10;
 
                     // 2. Find which "Cell" this pixel belongs to
@@ -113,7 +114,7 @@ public class ObjectScanner
         }
 
         // Keep the Y-Sort for correct overlapping
-        DepthObjects.Sort((a, b) => a.Y.CompareTo(b.Y));
+        DepthObjects.Sort((a, b) => b.Y.CompareTo(a.Y));
     }
 
     private bool IsJitterPoint(int x, int y, int cellX, int cellY, int cellSize)

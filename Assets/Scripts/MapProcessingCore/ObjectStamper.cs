@@ -29,7 +29,7 @@ public class ObjectStamper
             {
                 ImageData mnt = _library.GetMountain(obj.VariantID, obj.InternalDistance);
                 // Center-Bottom anchor
-                SpriteStamper.Stamp(map, mnt, obj.X - (mnt.Width / 2), obj.Y - mnt.Height);
+                SpriteStamper.Stamp(map, mnt, obj.X - (mnt.Width / 2), obj.Y);
             }
             else
             {
