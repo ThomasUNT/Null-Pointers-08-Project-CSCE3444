@@ -7,12 +7,18 @@ public class MapMaskManager : MonoBehaviour
 {
     public int width = 1536;
     public int height = 1024;
+    public DisplayMaskToUI uiDisplay;
 
     public Texture2D maskTexture;
+    private Texture2D displayTexture;
+    private MapProcessor processor;
+
+    private ImageData libMaskInput;
+    private Color32[] resultPixels;
 
     private string filePath;
 
-    void Awake()
+    void Start()
     {
         string folder = PlayerPrefs.GetString("LastMapFolder", "");
 
@@ -24,7 +30,69 @@ public class MapMaskManager : MonoBehaviour
 
         filePath = Path.Combine(folder, "colorMask.png");
 
+        // Initialize MapProcessor
+        string texPath = Path.Combine(Application.streamingAssetsPath, "MapTextures");
+        processor = new MapProcessor();
+        processor.Initialize(texPath, width, height);
+
+        // Setup Buffers
+        libMaskInput = new ImageData(width, height);
+        resultPixels = new Color32[width * height];
+        displayTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+
         LoadOrCreateMask();
+
+        SyncUnityToLib(maskTexture.GetPixels32(), libMaskInput);
+
+        UpdateFinalMap();
+    }
+
+    public void UpdateLivePreview()
+    {
+        SyncUnityToLib(maskTexture.GetPixels32(), libMaskInput);
+
+        // Process only the live preview
+        ImageData result = processor.ProcessLive(libMaskInput);
+
+        // Render result back to display
+        SyncLibToUnity(result, resultPixels);
+        displayTexture.SetPixels32(resultPixels);
+        displayTexture.Apply();
+
+        uiDisplay.SetDisplayTexture(displayTexture);
+    }
+
+    public void UpdateFinalMap()
+    {
+        ImageData final = processor.ProcessFinal(processor.ProcessLive(libMaskInput));
+
+        SyncLibToUnity(final, resultPixels);
+        displayTexture.SetPixels32(resultPixels);
+        displayTexture.Apply();
+
+        uiDisplay.SetDisplayTexture(displayTexture);
+    }
+
+    private void SyncUnityToLib(Color32[] source, ImageData dest)
+    {
+        for (int i = 0; i < source.Length; i++)
+        {
+            dest.Pixels[i].R = source[i].r;
+            dest.Pixels[i].G = source[i].g;
+            dest.Pixels[i].B = source[i].b;
+            dest.Pixels[i].A = source[i].a;
+        }
+    }
+
+    private void SyncLibToUnity(ImageData source, Color32[] dest)
+    {
+        for (int i = 0; i < dest.Length; i++)
+        {
+            dest[i].r = source.Pixels[i].R;
+            dest[i].g = source.Pixels[i].G;
+            dest[i].b = source.Pixels[i].B;
+            dest[i].a = 255;
+        }
     }
 
     void LoadOrCreateMask()
@@ -78,30 +146,3 @@ public class MapMaskManager : MonoBehaviour
         maskTexture.LoadImage(fileData);
     }
 }
-
-/*public static class MapBridge
-{
-    // Unity -> Library
-    public static void UpdateLibraryFromUnity(Color32[] unityPixels, ImageData libData)
-    {
-        for (int i = 0; i < unityPixels.Length; i++)
-        {
-            libData.Pixels[i].R = unityPixels[i].r;
-            libData.Pixels[i].G = unityPixels[i].g;
-            libData.Pixels[i].B = unityPixels[i].b;
-            libData.Pixels[i].A = unityPixels[i].a;
-        }
-    }
-
-    // Library -> Unity
-    public static void UpdateUnityFromLibrary(ImageData libData, Color32[] unityPixels)
-    {
-        for (int i = 0; i < unityPixels.Length; i++)
-        {
-            unityPixels[i].r = libData.Pixels[i].R;
-            unityPixels[i].g = libData.Pixels[i].G;
-            unityPixels[i].b = libData.Pixels[i].B;
-            unityPixels[i].a = libData.Pixels[i].A;
-        }
-    }
-}*/

@@ -28,7 +28,12 @@ public class MapDrawHandler : MonoBehaviour
 
     void Update()
     {
-        // Do nothing if neither mode is active
+        if (maskManager.maskTexture != null && tex != maskManager.maskTexture)
+        {
+            tex = maskManager.maskTexture;
+        }
+
+        // Do nothing if no draw mode is active
         if (!landMode && !waterMode && !forestMode && !mountainMode && !tundraMode && !desertMode)
             return;
 
@@ -37,6 +42,8 @@ public class MapDrawHandler : MonoBehaviour
         {
             lastPixelPos = null;
             pixelsSet = false;
+
+            maskManager.UpdateFinalMap();
         }
 
         if (Input.GetKey(KeyCode.Escape))
@@ -57,6 +64,8 @@ public class MapDrawHandler : MonoBehaviour
 
             tex.SetPixels32(pixels);
             tex.Apply(); // Apply changes to texture after drawing
+
+            maskManager.UpdateLivePreview();
         }
     }
 

@@ -91,10 +91,6 @@ namespace MapProcessing.Core
             _stamper.StampDepthObjects(_finalBuffer, _objectScanner.DepthObjects);
 
             return _finalBuffer;
-
-
-
-            return _finalBuffer;
         }
     }
 }

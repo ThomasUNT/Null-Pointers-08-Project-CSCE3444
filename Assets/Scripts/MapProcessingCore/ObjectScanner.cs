@@ -1,4 +1,5 @@
-﻿using MapProcessing.Core;
+﻿using System.Collections.Generic;
+using MapProcessing.Core;
 
 public class ObjectScanner
 {

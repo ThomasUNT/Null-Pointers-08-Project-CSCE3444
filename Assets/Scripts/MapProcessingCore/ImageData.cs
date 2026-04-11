@@ -1,4 +1,6 @@
-﻿namespace MapProcessing.Core
+﻿using System;
+
+namespace MapProcessing.Core
 {
     public struct Pixel
     {

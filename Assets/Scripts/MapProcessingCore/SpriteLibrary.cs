@@ -1,4 +1,7 @@
-﻿using MapProcessing.Core;
+﻿using System.Collections.Generic;
+using System.IO;
+using MapProcessing.Core;
+using MapProcessing.Core.Utils;
 
 public class SpriteLibrary
 {
