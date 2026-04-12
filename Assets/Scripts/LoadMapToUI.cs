@@ -28,18 +28,17 @@ public class LoadMapToUI : MonoBehaviour
 
     string FindMapImage(string folder)
     {
-        string[] extensions = { "*.png", "*.jpg", "*.jpeg" };
+        string[] files = Directory.GetFiles(folder, "map.*");
 
-        foreach (string ext in extensions)
+        foreach (string file in files)
         {
-            string[] files = Directory.GetFiles(folder, ext);
-            if (files.Length > 0)
+            string ext = Path.GetExtension(file).ToLower();
+            if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
             {
-                return files[0]; // return first match
+                return file;
             }
         }
-
-        return null;
+        return null; // Nothing named 'map' with those extensions found
     }
 
     IEnumerator LoadImage(string path)

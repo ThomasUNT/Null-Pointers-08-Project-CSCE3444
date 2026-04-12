@@ -131,6 +131,12 @@ public class MapMaskManager : MonoBehaviour
     {
         byte[] pngData = maskTexture.EncodeToPNG();
         File.WriteAllBytes(filePath, pngData);
+
+        string directory = Path.GetDirectoryName(filePath);
+        string mapPath = Path.Combine(directory, "map.png");
+
+        byte[] mapData = displayTexture.EncodeToPNG();
+        File.WriteAllBytes(mapPath, mapData);
     }
 
     void LoadMask()

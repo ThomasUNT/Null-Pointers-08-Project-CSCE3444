@@ -7,7 +7,7 @@ public class ObjectScanner
     public List<MapObject> DepthObjects = new List<MapObject>();
 
     public float mountainScale = 1.0f;
-    public float mountainDensity = 1.0f;
+    public float mountainDensity = 0.0f;
 
     public void Scan(ImageData mask, float[,] internalDist)
     {
