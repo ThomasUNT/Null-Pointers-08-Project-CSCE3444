@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using SFB;
+using System.Data;
 
 public class ImportMapButton : MonoBehaviour
 {
@@ -51,11 +52,12 @@ public class ImportMapButton : MonoBehaviour
         // Create map folder
         Directory.CreateDirectory(mapFolder);
 
-        // Copy image as map.png
-        string extension = Path.GetExtension(sourcePath);
-        string destinationImage = Path.Combine(mapFolder, "map" + extension);
-
-        File.Copy(sourcePath, destinationImage, true);
+        // Copy image and convert to PNG for consistency
+        byte[] fileData = File.ReadAllBytes(sourcePath);
+        Texture2D tex = new Texture2D(2, 2);
+        tex.LoadImage(fileData);
+        byte[] fileDataPNG = tex.EncodeToPNG();
+        System.IO.File.WriteAllBytes(Path.Combine(mapFolder, "map.png"), fileDataPNG);
 
         Debug.Log("Map imported to: " + mapFolder);
 
