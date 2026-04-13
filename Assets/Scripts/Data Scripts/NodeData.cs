@@ -108,7 +108,7 @@ public class MapSettings
         shorelineWidth = 5f;
 
         mountainSize = 1f;
-        mountainDensity = 0f;
+        mountainDensity = 0.5f;
 
         roughenScale = 0.03f;
         roughenStrength = 18f;

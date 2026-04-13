@@ -15,6 +15,7 @@ namespace MapProcessing.Core
         // Roughener State
         private float _lastRoughenScale = -1f;    // Initialized to -1 so first run always triggers
         private float _lastRoughenStrength = -1f;
+        private float _lastMountainScale = -1f;
 
         // Permanent Stages (Created once, reused forever)
         private EdgeRoughener _roughener = new EdgeRoughener();
@@ -41,7 +42,7 @@ namespace MapProcessing.Core
             _mountainTex = ImageLoader.Load(Path.Combine(textureFolder, "mountain.png"));
             _forestTex = ImageLoader.Load(Path.Combine(textureFolder, "forest.png"));
 
-            _spriteLibrary.Initialize(textureFolder);
+            _spriteLibrary.Initialize(textureFolder, 1.0f);
             _stamper = new ObjectStamper(_spriteLibrary);
 
             // Assign textures to clippers once
@@ -81,6 +82,14 @@ namespace MapProcessing.Core
             // --- Object Scanner ---
             _objectScanner.mountainDensity = s.mountainDensity;
             _objectScanner.mountainScale = s.mountainSize;
+
+            // --- Sprite Library ---
+            // Only update and recompute if settings have changed, since this is expensive.
+            if (s.mountainSize != _lastMountainScale)
+            {
+                _spriteLibrary.UpdateScale(s.mountainSize);
+                _lastMountainScale = s.mountainSize;
+            }
 
             // --- Edge Roughener ---
             // Only update and recompute if settings have changed, since this is expensive.

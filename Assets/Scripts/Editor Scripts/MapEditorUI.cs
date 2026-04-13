@@ -99,6 +99,8 @@ public class MapEditorUI : MonoBehaviour
         shorelineToggle.isOn = s.shorelineDarkening;
         shorelineDarknessSlider.value = s.shorelineDarkness;
         shorelineWidthSlider.value = s.shorelineWidth;
+        mountainSizeSlider.value = s.mountainSize;
+        mountainDensitySlider.value = s.mountainDensity;
         roughenScaleSlider.value = s.roughenScale;
         roughenStrengthSlider.value = s.roughenStrength;
     }
@@ -125,6 +127,8 @@ public class MapEditorUI : MonoBehaviour
         s.shorelineDarkening = shorelineToggle.isOn;
         s.shorelineDarkness = shorelineDarknessSlider.value;
         s.shorelineWidth = shorelineWidthSlider.value;
+        s.mountainSize = mountainSizeSlider.value;
+        s.mountainDensity = mountainDensitySlider.value;
         s.roughenScale = roughenScaleSlider.value;
         s.roughenStrength = roughenStrengthSlider.value;
 

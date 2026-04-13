@@ -85,7 +85,7 @@ public class ObjectScanner
                 else if (IsMountain(p))
                 {
                     // 1. Define the cell size based on scale (e.g., 20-30 pixels)
-                    int cellSize = (int)((30 - (10 * mountainDensity)) * mountainScale);
+                    int cellSize = (int)((80 - (70 * mountainDensity)) * mountainScale);
                     if (cellSize < 10) cellSize = 10;
 
                     // 2. Find which "Cell" this pixel belongs to

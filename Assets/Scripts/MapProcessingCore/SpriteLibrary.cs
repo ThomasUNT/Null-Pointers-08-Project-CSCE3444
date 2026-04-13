@@ -5,29 +5,35 @@ using MapProcessing.Core.Utils;
 
 public class SpriteLibrary
 {
-    // Dictionary or Array to hold our pre-scaled variants
     private Dictionary<int, ImageData[]> _mountainScales = new Dictionary<int, ImageData[]>();
-    //private ImageData[] _treeVariants; // If we had multiple tree variants, we could do the same for them
     private ImageData _treeSprite;
+    private string _lastFolder;
+    private List<ImageData> _baseMountainTextures = new List<ImageData>();
 
-    public float userMaxSize = 0.5f;
-
-    public void Initialize(string folder)
+    public void Initialize(string folder, float currentScale)
     {
+        _lastFolder = folder;
         _treeSprite = ImageLoader.Load(Path.Combine(folder, "tree1.png"));
 
-        int[] ids = { 1, 2, 3, 4 };
+        // Load base textures once so we don't hit the disk every time the scale changes
+        for (int id = 1; id <= 4; id++)
+        {
+            _baseMountainTextures.Add(ImageLoader.Load(Path.Combine(folder, $"mountain{id}.png")));
+        }
+    }
+
+    public void UpdateScale(float newScale)
+    {
         float[] scaleMultipliers = { 1.0f, 0.85f, 0.7f, 0.5f };
 
-        foreach (int id in ids)
+        for (int id = 1; id <= 4; id++)
         {
-            ImageData baseTex = ImageLoader.Load(Path.Combine(folder, $"mountain{id}.png"));
-
-            // If userMaxSize is 2.0, our "1.0f" scale is actually double the file size
+            ImageData baseTex = _baseMountainTextures[id - 1];
             _mountainScales[id] = new ImageData[4];
+
             for (int i = 0; i < 4; i++)
             {
-                float finalScale = scaleMultipliers[i] * userMaxSize;
+                float finalScale = scaleMultipliers[i] * newScale;
                 _mountainScales[id][i] = SpriteResizer.Resize(baseTex, finalScale);
             }
         }
