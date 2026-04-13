@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class MapDrawHandler : MonoBehaviour
 {
@@ -28,6 +30,8 @@ public class MapDrawHandler : MonoBehaviour
 
     void Update()
     {
+        bool canDraw = IsMouseDirectlyOverMap();
+
         if (maskManager.maskTexture != null && tex != maskManager.maskTexture)
         {
             tex = maskManager.maskTexture;
@@ -40,10 +44,13 @@ public class MapDrawHandler : MonoBehaviour
         // When mouse is released, stop connecting pixels
         if (Input.GetMouseButtonUp(0))
         {
+            if (pixelsSet)
+            {
+                maskManager.UpdateFinalMap();
+            }
+
             lastPixelPos = null;
             pixelsSet = false;
-
-            maskManager.UpdateFinalMap();
         }
 
         if (Input.GetKey(KeyCode.Escape))
@@ -53,8 +60,15 @@ public class MapDrawHandler : MonoBehaviour
         }
 
         // While mouse is held, continuously draw and connect pixels
-        if (Input.GetMouseButton(0) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
+        if (Input.GetMouseButton(0) && canDraw && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
         {
+            // Double check bounds before starting a stroke
+            if (!TryGetLocalPoint(Input.mousePosition, out Vector2 localPoint) ||
+                !TryGetNormalizedPoint(localPoint, out Vector2 norm))
+            {
+                return;
+            }
+
             if (!pixelsSet)
             {
                 pixels = tex.GetPixels32();
@@ -67,6 +81,28 @@ public class MapDrawHandler : MonoBehaviour
 
             maskManager.UpdateLivePreview();
         }
+    }
+
+    public bool IsMouseDirectlyOverMap()
+    {
+        // 1. Check if the mouse is even inside the Window hole first
+        if (!RectTransformUtility.RectangleContainsScreenPoint(maskManager.uiDisplay.GetComponent<RectTransform>(), Input.mousePosition, null))
+            return false;
+
+        // 2. See what UI objects are under the mouse
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = Input.mousePosition;
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        // 3. The first result in the list is the one visually "on top"
+        if (results.Count > 0)
+        {
+            // Check if the top-most object is our Map Image
+            return results[0].gameObject == maskManager.uiDisplay.gameObject;
+        }
+
+        return false;
     }
 
     private void HandleDraw(Vector2 screenPosition)

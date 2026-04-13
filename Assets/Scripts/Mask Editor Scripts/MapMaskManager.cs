@@ -10,6 +10,7 @@ public class MapMaskManager : MonoBehaviour
     public DisplayMaskToUI uiDisplay;
 
     public Texture2D maskTexture;
+    public RectTransform mapRect;
     private Texture2D displayTexture;
     public MapDataManager dataManager;
     public MapProcessor processor;
@@ -52,6 +53,10 @@ public class MapMaskManager : MonoBehaviour
 
     public void UpdateLivePreview()
     {
+        // Cache the current position and scale of the map
+        Vector2 cachedPos = mapRect.anchoredPosition;
+        Vector3 cachedScale = mapRect.localScale;
+
         SyncUnityToLib(maskTexture.GetPixels32(), libMaskInput);
 
         // Process only the live preview
@@ -63,10 +68,18 @@ public class MapMaskManager : MonoBehaviour
         displayTexture.Apply();
 
         uiDisplay.SetDisplayTexture(displayTexture);
+
+        // Restore map to cached position
+        mapRect.anchoredPosition = cachedPos;
+        mapRect.localScale = cachedScale;
     }
 
     public void UpdateFinalMap()
     {
+        // Cache the current position and scale of the map
+        Vector2 cachedPos = mapRect.anchoredPosition;
+        Vector3 cachedScale = mapRect.localScale;
+
         ImageData final = processor.ProcessFinal(processor.ProcessLive(libMaskInput));
 
         SyncLibToUnity(final, resultPixels);
@@ -74,6 +87,10 @@ public class MapMaskManager : MonoBehaviour
         displayTexture.Apply();
 
         uiDisplay.SetDisplayTexture(displayTexture);
+
+        // Restore map to cached position
+        mapRect.anchoredPosition = cachedPos;
+        mapRect.localScale = cachedScale;
     }
 
     private void SyncUnityToLib(Color32[] source, ImageData dest)

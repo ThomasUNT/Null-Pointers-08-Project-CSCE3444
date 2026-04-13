@@ -6,6 +6,8 @@ using System.Collections;
 
 public class MapDataManager : MonoBehaviour
 {
+    public bool suppressUI = false;
+
     public MapData mapData = new MapData();
     private string filePath;
     public RectTransform mapRect;
@@ -103,6 +105,8 @@ public class MapDataManager : MonoBehaviour
 
     public void DrawNodes()
     {
+        if (suppressUI) return;
+
         float mapScale = mapRect.localScale.x;
 
         // TEMPORARY
@@ -149,6 +153,8 @@ public class MapDataManager : MonoBehaviour
 
     public void DrawMapTexts()
     {
+        if (suppressUI) return;
+
         float mapScale = mapRect.localScale.x;
         float minZoom = 1f;
         float maxZoom = 3f;

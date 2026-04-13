@@ -19,25 +19,19 @@ public class CursorManager : MonoBehaviour
 
     void Update()
     {
-        Vector2 localPoint;
-        // Convert mouse position to a point relative to the Map
-        bool isOverMap = RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            mapWindow,
-            Input.mousePosition,
-            null,
-            out localPoint
-        );
+        // Ask the DrawHandler if the mouse is physically over the map and not blocked by UI
+        bool canDrawHere = drawHandler.IsMouseDirectlyOverMap();
 
-        // Check if cursor is actually inside the map bounds
-        if (isOverMap && drawHandler.mapRect.rect.Contains(localPoint) && CheckDrawModes())
+        // Check if we are in a draw mode AND the map is the top-most object
+        if (canDrawHere && CheckDrawModes())
         {
-            Cursor.visible = false; // Hide the standard system cursor
+            Cursor.visible = false;
             previewImage.enabled = true;
             UpdateBrushVisuals();
         }
         else
         {
-            Cursor.visible = true; // Show standard cursor when outside
+            Cursor.visible = true;
             previewImage.enabled = false;
         }
     }

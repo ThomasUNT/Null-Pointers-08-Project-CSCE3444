@@ -360,6 +360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7d636a2b30a3c741b6eb292bf716a6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapDataManager
+  suppressUI: 1
   mapData:
     nodes: []
     mapTexts: []
@@ -3172,7 +3173,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapDrawHandler
   mapRect: {fileID: 1943488808}
   maskManager: {fileID: 1006935565}
-  brushSize: 4
+  brushSize: 25
   landMode: 0
   waterMode: 0
   forestMode: 0
@@ -8782,7 +8783,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -10229,6 +10230,7 @@ MonoBehaviour:
   height: 1024
   uiDisplay: {fileID: 1943488813}
   maskTexture: {fileID: 0}
+  mapRect: {fileID: 1943488808}
   dataManager: {fileID: 28997793}
 --- !u!4 &1006935566
 Transform:
@@ -17778,7 +17780,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
