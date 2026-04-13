@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class MapOpenEntryAdder : MonoBehaviour
@@ -7,6 +8,7 @@ public class MapOpenEntryAdder : MonoBehaviour
     public GameObject saveEntryContainer;
     public GameObject saveEntryPrefab;
     public MapSavePreviewManager PreviewManager;
+    public GameObject noSaveText;
 
     private List<GameObject> saveEntries = new List<GameObject>();
 
@@ -24,12 +26,29 @@ public class MapOpenEntryAdder : MonoBehaviour
         if (!Directory.Exists(mapsRoot))
             Directory.CreateDirectory(mapsRoot);
 
-        string[] mapFolders = Directory.GetDirectories(mapsRoot);
+        string[] foldersInMapDir = Directory.GetDirectories(mapsRoot);
 
-        // TODO: Filter out folders in this directory which are not valid maps
+        // Attempt to figure out if a folder is a map or not
+        List<string> mapFolders = new List<string>();
+        foreach(string maybeMapDir in foldersInMapDir)
+        {
+            if (File.Exists(Path.Combine(maybeMapDir, "data.json")))
+            {
+                mapFolders.Add(maybeMapDir);
+            }
+        }
 
+        // If no saves are present, display message and finish up early
+        if (mapFolders.Count == 0)
+        {
+            noSaveText.SetActive(true);
+            return;
+        } else
+        {
+            noSaveText.SetActive(false);
+        }
 
-        float entryTopPadding = 20;
+            float entryTopPadding = 20;
         float entryHeight = 130;
         float entryPlusPaddingHeight = entryTopPadding + entryHeight;
 
@@ -37,11 +56,11 @@ public class MapOpenEntryAdder : MonoBehaviour
         // Set container to appropriate size
         Transform containerTransform = saveEntryContainer.transform;
         RectTransform containerRectTransform = containerTransform.GetComponent<RectTransform>();
-        containerRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, entryTopPadding + entryPlusPaddingHeight * mapFolders.Length);
+        containerRectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, entryTopPadding + entryPlusPaddingHeight * mapFolders.Count);
 
 
         // Add save entries
-        for (int entryIdx = 0; entryIdx < mapFolders.Length; entryIdx++)
+        for (int entryIdx = 0; entryIdx < mapFolders.Count; entryIdx++)
         {
             string targetFolder = mapFolders[entryIdx];
             GameObject newEntry = Instantiate(saveEntryPrefab, containerTransform);
