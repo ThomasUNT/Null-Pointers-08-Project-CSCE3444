@@ -57,3 +57,60 @@ public class MapTextData
         this.arc = 0f;
     }
 }
+
+[System.Serializable]
+public class MapSettings
+{
+    // --- Water Settings ---
+    // depth darkening settings
+    public bool waterDepth;
+    public float waterDepthDistance;
+    public float maxDepthDarkness;
+
+    // wave settings
+    public bool waveHighlights;
+    public bool taperWaves;
+    public float waveBrightness;
+    public float waveDistance;
+    public float waveSpacing;
+    public float waveThickness;
+
+    // --- Land Settings ---
+    // shoreline darkening settings
+    public bool shorelineDarkening;
+    public float shorelineDarkness;
+    public float shorelineWidth;
+
+    // mountain settings
+    public float mountainSize;
+    public float mountainDensity;
+
+    // roughener settings
+    public float roughenScale;
+    public float roughenStrength;
+
+    public MapSettings()
+    {
+        // Default settings
+        waterDepth = true;
+        waterDepthDistance = 300f;
+        maxDepthDarkness = 0.8f;
+
+        waveHighlights = true;
+        taperWaves = true;
+        waveBrightness = 40f;
+        waveDistance = 30f;
+        waveSpacing = 8f;
+        waveThickness = 3f;
+
+        shorelineDarkening = true;
+        shorelineDarkness = 0.5f;
+        shorelineWidth = 5f;
+
+        mountainSize = 1f;
+        mountainDensity = 0f;
+
+        roughenScale = 0.03f;
+        roughenStrength = 18f;
+    }
+}

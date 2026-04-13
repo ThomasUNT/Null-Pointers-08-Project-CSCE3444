@@ -11,7 +11,8 @@ public class MapMaskManager : MonoBehaviour
 
     public Texture2D maskTexture;
     private Texture2D displayTexture;
-    private MapProcessor processor;
+    public MapDataManager dataManager;
+    public MapProcessor processor;
 
     private ImageData libMaskInput;
     private Color32[] resultPixels;
@@ -39,6 +40,8 @@ public class MapMaskManager : MonoBehaviour
         libMaskInput = new ImageData(width, height);
         resultPixels = new Color32[width * height];
         displayTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+
+        processor.ApplySettings(dataManager.mapData.settings);
 
         LoadOrCreateMask();
 
