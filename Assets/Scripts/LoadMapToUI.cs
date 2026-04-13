@@ -15,7 +15,7 @@ public class LoadMapToUI : MonoBehaviour
             return;
         }
 
-        string path = FindMapImage(folder);
+        string path = Path.Combine(folder, "map.png");
 
         if (!File.Exists(path))
         {
@@ -24,21 +24,6 @@ public class LoadMapToUI : MonoBehaviour
         }
 
         StartCoroutine(LoadImage(path));
-    }
-
-    string FindMapImage(string folder)
-    {
-        string[] files = Directory.GetFiles(folder, "map.*");
-
-        foreach (string file in files)
-        {
-            string ext = Path.GetExtension(file).ToLower();
-            if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
-            {
-                return file;
-            }
-        }
-        return null; // Nothing named 'map' with those extensions found
     }
 
     IEnumerator LoadImage(string path)
