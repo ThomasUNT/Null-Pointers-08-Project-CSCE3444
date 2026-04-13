@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class MapDrawHandler : MonoBehaviour
 {
@@ -15,18 +17,40 @@ public class MapDrawHandler : MonoBehaviour
     public bool tundraMode = false;
     public bool desertMode = false;
 
+    public bool pixelsSet = false;
+
+    public Texture2D tex;
+    public Color32[] pixels;
     private Vector2? lastPixelPos = null;
+
+    void Start()
+    {
+        tex = maskManager.maskTexture;
+    }
 
     void Update()
     {
-        // Do nothing if neither mode is active
+        bool canDraw = IsMouseDirectlyOverMap();
+
+        if (maskManager.maskTexture != null && tex != maskManager.maskTexture)
+        {
+            tex = maskManager.maskTexture;
+        }
+
+        // Do nothing if no draw mode is active
         if (!landMode && !waterMode && !forestMode && !mountainMode && !tundraMode && !desertMode)
             return;
 
         // When mouse is released, stop connecting pixels
         if (Input.GetMouseButtonUp(0))
         {
+            if (pixelsSet)
+            {
+                maskManager.UpdateFinalMap();
+            }
+
             lastPixelPos = null;
+            pixelsSet = false;
         }
 
         if (Input.GetKey(KeyCode.Escape))
@@ -36,12 +60,49 @@ public class MapDrawHandler : MonoBehaviour
         }
 
         // While mouse is held, continuously draw and connect pixels
-        if (Input.GetMouseButton(0) && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
+        if (Input.GetMouseButton(0) && canDraw && !Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
         {
+            // Double check bounds before starting a stroke
+            if (!TryGetLocalPoint(Input.mousePosition, out Vector2 localPoint) ||
+                !TryGetNormalizedPoint(localPoint, out Vector2 norm))
+            {
+                return;
+            }
+
+            if (!pixelsSet)
+            {
+                pixels = tex.GetPixels32();
+                pixelsSet = true;
+            }
             HandleDraw(Input.mousePosition);
 
-            maskManager.maskTexture.Apply(); // Apply changes to texture after drawing
+            tex.SetPixels32(pixels);
+            tex.Apply(); // Apply changes to texture after drawing
+
+            maskManager.UpdateLivePreview();
         }
+    }
+
+    public bool IsMouseDirectlyOverMap()
+    {
+        // 1. Check if the mouse is even inside the Window hole first
+        if (!RectTransformUtility.RectangleContainsScreenPoint(maskManager.uiDisplay.GetComponent<RectTransform>(), Input.mousePosition, null))
+            return false;
+
+        // 2. See what UI objects are under the mouse
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = Input.mousePosition;
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        // 3. The first result in the list is the one visually "on top"
+        if (results.Count > 0)
+        {
+            // Check if the top-most object is our Map Image
+            return results[0].gameObject == maskManager.uiDisplay.gameObject;
+        }
+
+        return false;
     }
 
     private void HandleDraw(Vector2 screenPosition)
@@ -98,8 +159,6 @@ public class MapDrawHandler : MonoBehaviour
 
     private void DrawPixel(Vector2 normalizedPoint)
     {
-        Texture2D tex = maskManager.maskTexture;
-
         // Convert normalized coordinates to pixel coordinates
         int px = Mathf.FloorToInt(normalizedPoint.x * tex.width);
         int py = Mathf.FloorToInt(normalizedPoint.y * tex.height);
@@ -113,7 +172,6 @@ public class MapDrawHandler : MonoBehaviour
         // Determine color based on mode
         Color32 color = Color.white;
 
-        Color32[] pixels = tex.GetPixels32();
         int width = tex.width;
         int height = tex.height;
 
@@ -139,9 +197,6 @@ public class MapDrawHandler : MonoBehaviour
         {
             DrawBrush(pixels, width, height, px, py, color);
         }
-
-        // Apply modified pixels back to texture
-        tex.SetPixels32(pixels);
 
         // Store current pixel as last pixel for next frame
         lastPixelPos = current;

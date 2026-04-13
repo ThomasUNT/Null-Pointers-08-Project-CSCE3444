@@ -54,9 +54,9 @@ public class MapSavePreviewManager : MonoBehaviour
         PreviewDetails.text = details;
 
         // Populate image
-        string imagePath = FindMapImage(savePath);
+        string imagePath = Path.Combine(savePath, "map.png");
         Texture2D tex = new Texture2D(1, 1);
-        if (imagePath != null)
+        if (File.Exists(imagePath))
         {
             // Found a valid image
             byte[] fileData = File.ReadAllBytes(imagePath);
@@ -101,26 +101,6 @@ public class MapSavePreviewManager : MonoBehaviour
 
         SceneManager.LoadScene(GotoSceneOnSuccess);
     }
-
-
-    // From LoadMapToUI.cs
-    // Returns the path to the first image with a known image extension
-    string FindMapImage(string folder)
-    {
-        string[] extensions = { "*.png", "*.jpg", "*.jpeg" };
-
-        foreach (string ext in extensions)
-        {
-            string[] files = Directory.GetFiles(folder, ext);
-            if (files.Length > 0)
-            {
-                return files[0]; // return first match
-            }
-        }
-
-        return null;
-    }
-
 
     // From https://stackoverflow.com/a/468131
     static long DirSize(DirectoryInfo d)

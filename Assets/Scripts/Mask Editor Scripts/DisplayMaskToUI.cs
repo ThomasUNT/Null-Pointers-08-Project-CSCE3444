@@ -3,30 +3,23 @@ using UnityEngine.UI;
 
 public class DisplayMaskToUI : MonoBehaviour
 {
-    public MapMaskManager maskManager;
+    private RawImage _rawImage;
+    private RectTransform _rt;
 
-    void Start()
+    void Awake()
     {
-        if (maskManager == null || maskManager.maskTexture == null)
+        _rawImage = GetComponent<RawImage>();
+        _rt = GetComponent<RectTransform>();
+        if (_rawImage == null)
         {
-            Debug.LogError("MaskManager or maskTexture missing.");
-            return;
+            Debug.LogError("RawImage component missing.");
         }
-
-        ApplyTexture(maskManager.maskTexture);
     }
 
-    public void ApplyTexture(Texture2D tex)
+    public void SetDisplayTexture(Texture2D tex)
     {
-        Sprite sprite = Sprite.Create(
-            tex,
-            new Rect(0, 0, tex.width, tex.height),
-            new Vector2(0.5f, 0.5f)
-        );
-
-        Image img = GetComponent<Image>();
-        img.sprite = sprite;
-
+        if (_rawImage == null) return;
+        _rawImage.texture = tex;
         FitToParent(tex);
     }
 
@@ -41,8 +34,7 @@ public class DisplayMaskToUI : MonoBehaviour
 
         float scale = Mathf.Min(scaleX, scaleY);
 
-        RectTransform rt = GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(tex.width * scale, tex.height * scale);
-        rt.anchoredPosition = Vector2.zero;
+        _rt.sizeDelta = new Vector2(tex.width * scale, tex.height * scale);
+        _rt.anchoredPosition = Vector2.zero;
     }
 }
