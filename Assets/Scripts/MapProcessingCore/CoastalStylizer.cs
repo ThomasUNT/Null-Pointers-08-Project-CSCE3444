@@ -53,7 +53,11 @@ namespace MapProcessing.Core
                     {
                         if (EnableCoastDarkening && dist < ShorelineWidth)
                         {
-                            float factor = Math.Max(ShorelineDarkness, dist / ShorelineWidth);
+                            float distancePercent = dist / ShorelineWidth;
+
+                            float darkeningEffect = (1.0f - distancePercent) * ShorelineDarkness;
+                            float factor = 1.0f - darkeningEffect;
+
                             texP.R = (byte)(texP.R * factor);
                             texP.G = (byte)(texP.G * factor);
                             texP.B = (byte)(texP.B * factor);
