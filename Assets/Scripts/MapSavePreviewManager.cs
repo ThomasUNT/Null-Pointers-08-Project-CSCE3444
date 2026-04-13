@@ -23,6 +23,7 @@ public class MapSavePreviewManager : MonoBehaviour
         if (!Directory.Exists(savePath))
         {
             Debug.LogError("Map not found at: " + savePath);
+            PreviewUnselectedCover.SetActive(true);
             return;
         }
 
