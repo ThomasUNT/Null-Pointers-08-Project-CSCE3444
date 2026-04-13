@@ -7,6 +7,9 @@ public class MapEditorUI : MonoBehaviour
     public GameObject biomesPanel;
     public GameObject buttonPanel;
     public GameObject leftPanel;
+    public GameObject settingsPanel;
+    public GameObject landSettingsPanel;
+    public GameObject waterSettingsPanel;
 
     public SliderUI startPanelSlider;
     public SliderUI biomePanelSlider;
@@ -26,6 +29,7 @@ public class MapEditorUI : MonoBehaviour
     {
         startPanel.SetActive(true);
         biomesPanel.SetActive(false);
+        settingsPanel.SetActive(false);
 
         startPanelSlider.RefreshFromSource();
     }
@@ -40,5 +44,25 @@ public class MapEditorUI : MonoBehaviour
     {
         buttonPanel.SetActive(false);
         leftPanel.SetActive(true);
+    }
+
+    public void OpenSettingsPanel()
+    {
+        settingsPanel.SetActive(true);
+        startPanel.SetActive(false);
+        landSettingsPanel.SetActive(false);
+        waterSettingsPanel.SetActive(false);
+    }
+
+    public void OpenLandSettingsPanel()
+    {
+        landSettingsPanel.SetActive(true);
+        settingsPanel.SetActive(false);
+    }
+
+    public void OpenWaterSettingsPanel()
+    {
+        waterSettingsPanel.SetActive(true);
+        settingsPanel.SetActive(false);
     }
 }
