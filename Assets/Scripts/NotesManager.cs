@@ -101,6 +101,11 @@ public class NotesManager : MonoBehaviour
         return id;
     }
 
+    public void CreateNoteFromButton()
+    {
+        CreateNote("");
+    }
+
     void OpenNote(string path)
     {
         currentNotePath = path;
@@ -112,13 +117,17 @@ public class NotesManager : MonoBehaviour
         currentNodeId = parsed.nodeId;
 
         noteEditor.text = parsed.content;
-        noteEditor.text = File.ReadAllText(path);
     }
 
     public void SaveNote()
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
-        File.WriteAllText(currentNotePath, noteEditor.text);
+
+        string frontmatter = BuildFrontmatter(currentNoteId, currentNodeId);
+
+        string fullFileContent = frontmatter + "\n" + noteEditor.text;
+
+        File.WriteAllText(currentNotePath, fullFileContent);
     }
 
     public void RenameNote()
@@ -145,18 +154,15 @@ public class NotesManager : MonoBehaviour
 
         noteEditor.text = "";
         titleEditor.text = "";
+        currentNoteId = null;
+        currentNodeId = null;
         LoadNotes();
     }
 
     private string BuildFrontmatter(string id, string nodeId)
     {
         return
-        $@"---
-        id: {id}
-        nodeId: {nodeId ?? ""}
-        ---
-    
-        ";
+        "---\nid: " + id + "\nnodeId: " + nodeId + "\n---";
     }
 
     private (string id, string nodeId, string content) ParseNoteFile(string text)
