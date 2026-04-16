@@ -23,7 +23,48 @@ public class NotesManager : MonoBehaviour
     private string folderPath;
     private string currentNotePath;
 
-    void Start()
+    [Header("Font Settings")]
+    public float sizeStep = 50f; //Step size for font resizing
+    public float defaultBaseSize = 24f; //Default font size for new notes
+    
+
+    public void IncrementalIncrease() => AdjustSelectionSize(sizeStep);
+    public void IncrementalDecrease() => AdjustSelectionSize(-sizeStep);
+
+    private void AdjustSelectionSize(float amount)
+    {
+        int start = Mathf.Min(noteEditor.selectionStringAnchorPosition, noteEditor.selectionStringFocusPosition);
+        int end = Mathf.Max(noteEditor.selectionStringAnchorPosition, noteEditor.selectionStringFocusPosition);
+
+        if (start == end) return; //No text selected to adjust
+
+        string originalText = noteEditor.text;
+        string selectedText = originalText.Substring(start, end - start);
+        float currentSize = defaultBaseSize;
+
+        Match match = Regex.Match(selectedText, @"<size=([\d\.]+)>");
+
+        if (match.Success)
+        {
+            if (float.TryParse(match.Groups[1].Value, out currentSize)) ;
+        }
+            
+        float targetSize = currentSize + amount;
+
+        string cleanedText = Regex.Replace(selectedText, @"<size=[\d\.]+>|<\/size>", string.Empty);
+
+        string formattedText = $"<size={targetSize}>{cleanedText}</size>";
+
+        noteEditor.text = originalText.Remove(start, end - start).Insert(start, formattedText); //Apply new size
+
+        noteEditor.ActivateInputField();
+        noteEditor.selectionStringAnchorPosition = start;
+        noteEditor.selectionStringFocusPosition = start + formattedText.Length;
+
+        SaveNote(); //Auto-save after resizing
+    }
+
+void Start()
     {
         noteEditor.richText = true; //Allows rich text formatting
 
@@ -38,11 +79,7 @@ public class NotesManager : MonoBehaviour
     public void FormatUnderline() => ApplyTag("<u>", "</u>");
     public void FormatResize(float size) => ApplyTag($"<size={size}>", "</size>");
 
-    public void FormatColor(Color color)
-    {
-        string hex = ColorUtility.ToHtmlStringRGB(color);
-        ApplyTag($"<color=#{hex}>", "</color>");
-    }
+
 
     private void ApplyTag(string open, string close)
     {
@@ -69,7 +106,7 @@ public class NotesManager : MonoBehaviour
         noteEditor.ActivateInputField();
 
         noteEditor.selectionStringAnchorPosition = start;
-        noteEditor.selectionStringAnchorPosition = start + formattedText.Length;
+        noteEditor.selectionStringFocusPosition = start + formattedText.Length;
 
         SaveNote(); //Auto-save after formatting
     }
@@ -84,9 +121,7 @@ public class NotesManager : MonoBehaviour
         string text = noteEditor.text;
         string selectedText = text.Substring(start, end - start);
 
-        // Regex explanation: 
-        // <[^>]*> matches anything starting with <, ending with >, 
-        // and containing any characters except > in between.
+
         string plainText = Regex.Replace(selectedText, "<[^>]*>", string.Empty);
 
         noteEditor.text = text.Remove(start, end - start).Insert(start, plainText);
