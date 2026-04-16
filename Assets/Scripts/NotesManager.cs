@@ -50,6 +50,8 @@ public class NotesManager : MonoBehaviour
         noteEditor.text = "";
         titleEditor.text = "";
 
+        NoteRegistry.Rebuild(folderPath);
+
         LoadNotes();
     }
 
@@ -117,6 +119,19 @@ public class NotesManager : MonoBehaviour
         currentNodeId = parsed.nodeId;
 
         noteEditor.text = parsed.content;
+    }
+
+    public void OpenNoteById(string noteId)
+    {
+        string path = NoteRegistry.GetPath(noteId);
+        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+        {
+            OpenNote(path);
+        }
+        else
+        {
+            Debug.LogError($"Note with ID {noteId} not found in Registry!");
+        }
     }
 
     public void SaveNote()
