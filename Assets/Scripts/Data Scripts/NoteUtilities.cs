@@ -1,3 +1,5 @@
+using System.IO;
+
 public static class NoteUtilities
 {
     public static string FindFilePathById(string noteFolder, string targetGuid)

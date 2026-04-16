@@ -18,6 +18,9 @@ public class NotesManager : MonoBehaviour
     private string folderPath;
     private string currentNotePath;
 
+    private string currentNoteId;
+    private string currentNodeId;
+
     void Start()
     {
         SetMap(PlayerPrefs.GetString("LastMapFolder", ""));
@@ -70,7 +73,7 @@ public class NotesManager : MonoBehaviour
         }
     }
 
-    public void CreateNote()
+    public string CreateNote(string nodeId)
     {
         if (string.IsNullOrEmpty(folderPath)) InitializeNotes();
 
@@ -86,17 +89,29 @@ public class NotesManager : MonoBehaviour
         }
         while (File.Exists(fullPath));
 
-        File.WriteAllText(fullPath, ""); // Create empty note file
+        string id = System.Guid.NewGuid().ToString();
+        string content = BuildFrontmatter(id, "");
+
+        File.WriteAllText(fullPath, content); // Store IDs in new note file
 
         currentNotePath = fullPath;
+        currentNoteId = id;
         LoadNotes();
         OpenNote(fullPath);
+        return id;
     }
 
     void OpenNote(string path)
     {
         currentNotePath = path;
         titleEditor.text = Path.GetFileNameWithoutExtension(path);
+        string rawText = File.ReadAllText(path);
+        var parsed = ParseNoteFile(rawText);
+
+        currentNoteId = parsed.id;
+        currentNodeId = parsed.nodeId;
+
+        noteEditor.text = parsed.content;
         noteEditor.text = File.ReadAllText(path);
     }
 
@@ -131,5 +146,46 @@ public class NotesManager : MonoBehaviour
         noteEditor.text = "";
         titleEditor.text = "";
         LoadNotes();
+    }
+
+    private string BuildFrontmatter(string id, string nodeId)
+    {
+        return
+        $@"---
+        id: {id}
+        nodeId: {nodeId ?? ""}
+        ---
+    
+        ";
+    }
+
+    private (string id, string nodeId, string content) ParseNoteFile(string text)
+    {
+        if (!text.StartsWith("---"))
+            return (null, null, text);
+
+        int end = text.IndexOf("---", 3);
+        if (end == -1)
+            return (null, null, text);
+
+        string frontmatter = text.Substring(3, end - 3);
+        string content = text.Substring(end + 3).TrimStart();
+
+        string id = null;
+        string nodeId = null;
+
+        foreach (var line in frontmatter.Split('\n'))
+        {
+            var parts = line.Split(':');
+            if (parts.Length < 2) continue;
+
+            string key = parts[0].Trim();
+            string value = parts[1].Trim();
+
+            if (key == "id") id = value;
+            if (key == "nodeId") nodeId = value;
+        }
+
+        return (id, nodeId, content);
     }
 }
