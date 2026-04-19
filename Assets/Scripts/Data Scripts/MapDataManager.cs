@@ -14,6 +14,7 @@ public class MapDataManager : MonoBehaviour
     public GameObject nodeIconPrefab;
     public GameObject mapTextPrefab;
     public NodeEditorUI editorUI;
+    public NotesManager noteManager;
     public int defaultNodeSizeMultiplier = 1;
 
     [Header("Node Type Sprites")]
@@ -73,7 +74,7 @@ public class MapDataManager : MonoBehaviour
     {
         NodeData node = new NodeData(position.x, position.y);
 
-        string newNoteId = RequestNewNote(node.id);
+        string newNoteId = noteManager.CreateNote(node.id);
 
         node.noteIds.Add(newNoteId);
         node.defaultNoteId = newNoteId;

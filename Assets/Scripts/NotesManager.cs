@@ -69,12 +69,19 @@ public class NotesManager : MonoBehaviour
 
     void Start()
     {
-        noteEditor.richText = true; //Allows rich text formatting
+        if (noteEditor != null)
+        {
+            noteEditor.richText = true; //Allows rich text formatting
+            noteEditor.onEndEdit.AddListener(delegate { SaveNote(); });
+        }
+
+        if (titleEditor != null)
+        {
+            titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
+        }
 
         SetMap(PlayerPrefs.GetString("LastMapFolder", ""));
         InitializeNotes();
-        noteEditor.onEndEdit.AddListener(delegate { SaveNote(); });
-        titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
     }
 
     public void FormatBold() => ApplyTag("<b>", "</b>");
@@ -154,16 +161,18 @@ public class NotesManager : MonoBehaviour
         }
 
 
-        noteEditor.text = "";
-        titleEditor.text = "";
+        if (noteEditor != null) noteEditor.text = "";
+        if (titleEditor != null) titleEditor.text = "";
 
         NoteRegistry.Rebuild(folderPath);
 
-        LoadNotes();
+        if (notesListContent != null) LoadNotes();
     }
 
     public void LoadNotes()
     {
+        if (notesListContent == null) return;
+
         foreach (Transform child in notesListContent)
             Destroy(child.gameObject);
 
