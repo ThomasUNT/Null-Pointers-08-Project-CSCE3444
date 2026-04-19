@@ -72,11 +72,29 @@ public class MapDataManager : MonoBehaviour
     public NodeData AddNode(Vector2 position)
     {
         NodeData node = new NodeData(position.x, position.y);
+
+        string newNoteId = RequestNewNote(node.id);
+
+        node.noteIds.Add(newNoteId);
+        node.defaultNoteId = newNoteId;
+
         mapData.nodes.Add(node);
         //Save(); 
         DrawNodes();
 
         return node;
+    }
+
+    // Temporary - this will eventually be moved to the Note Manager
+    private string RequestNewNote(string parentNodeId)
+    {
+        string newGuid = System.Guid.NewGuid().ToString();
+
+        // TODO: When teammate is done, call: 
+        // NotesManager.Instance.CreateNoteOnDisk(newGuid, parentNodeId);
+
+        Debug.Log($"Node {parentNodeId} is waiting for Note {newGuid} to be created.");
+        return newGuid;
     }
 
     public MapTextData AddText(Vector2 position)

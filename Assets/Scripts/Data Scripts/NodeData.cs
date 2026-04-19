@@ -1,21 +1,31 @@
+using System;
+using System.Collections.Generic;
+
 [System.Serializable]
 public class NodeData
 {
+    public string id;
     public float x;
     public float y;
     public float size;
     public string text;
+
+    public List<string> noteIds;
+    public string defaultNoteId;
     public string titleTextId;
+
     public int priority;
     public string type;
 
     public NodeData(float x, float y)
     {
+        this.id = System.Guid.NewGuid().ToString();
         this.x = x;
         this.y = y;
         this.size = 1.0f;
         this.text = "";
 
+        this.noteIds = new List<string>();
         // reference to MapTextData entry for the title text of the node
         this.titleTextId = "";
 

@@ -23,6 +23,9 @@ public class NotesManager : MonoBehaviour
     private string folderPath;
     private string currentNotePath;
 
+    private string currentNoteId;
+    private string currentNodeId;
+
     [Header("Font Settings")]
     public float sizeStep = 50f; //Step size for font resizing
     public float defaultBaseSize = 24f; //Default font size for new notes
@@ -46,9 +49,9 @@ public class NotesManager : MonoBehaviour
 
         if (match.Success)
         {
-            if (float.TryParse(match.Groups[1].Value, out currentSize)) ;
+            float.TryParse(match.Groups[1].Value, out currentSize);
         }
-            
+
         float targetSize = currentSize + amount;
 
         string cleanedText = Regex.Replace(selectedText, @"<size=[\d\.]+>|<\/size>", string.Empty);
@@ -64,7 +67,7 @@ public class NotesManager : MonoBehaviour
         SaveNote(); //Auto-save after resizing
     }
 
-void Start()
+    void Start()
     {
         noteEditor.richText = true; //Allows rich text formatting
 
@@ -110,6 +113,7 @@ void Start()
 
         SaveNote(); //Auto-save after formatting
     }
+
     //CLEAR FORMATTING BUTTON
     public void ClearSelectedFormatting()
     {
@@ -120,7 +124,6 @@ void Start()
 
         string text = noteEditor.text;
         string selectedText = text.Substring(start, end - start);
-
 
         string plainText = Regex.Replace(selectedText, "<[^>]*>", string.Empty);
 
@@ -154,6 +157,8 @@ void Start()
         noteEditor.text = "";
         titleEditor.text = "";
 
+        NoteRegistry.Rebuild(folderPath);
+
         LoadNotes();
     }
 
@@ -177,7 +182,7 @@ void Start()
         }
     }
 
-    public void CreateNote()
+    public string CreateNote(string nodeId)
     {
         if (string.IsNullOrEmpty(folderPath)) InitializeNotes();
 
@@ -193,24 +198,60 @@ void Start()
         }
         while (File.Exists(fullPath));
 
-        File.WriteAllText(fullPath, ""); // Create empty note file
+        string id = System.Guid.NewGuid().ToString();
+        string content = BuildFrontmatter(id, nodeId);
+
+        File.WriteAllText(fullPath, content); // Store IDs in new note file
 
         currentNotePath = fullPath;
+        currentNoteId = id;
+        currentNodeId = nodeId;
+
         LoadNotes();
         OpenNote(fullPath);
+        return id;
+    }
+
+    public void CreateNoteFromButton()
+    {
+        CreateNote("");
     }
 
     void OpenNote(string path)
     {
         currentNotePath = path;
         titleEditor.text = Path.GetFileNameWithoutExtension(path);
-        noteEditor.text = File.ReadAllText(path);
+        string rawText = File.ReadAllText(path);
+        var parsed = ParseNoteFile(rawText);
+
+        currentNoteId = parsed.id;
+        currentNodeId = parsed.nodeId;
+
+        noteEditor.text = parsed.content;
+    }
+
+    public void OpenNoteById(string noteId)
+    {
+        string path = NoteRegistry.GetPath(noteId);
+        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+        {
+            OpenNote(path);
+        }
+        else
+        {
+            Debug.LogError($"Note with ID {noteId} not found in Registry!");
+        }
     }
 
     public void SaveNote()
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
-        File.WriteAllText(currentNotePath, noteEditor.text);
+
+        string frontmatter = BuildFrontmatter(currentNoteId, currentNodeId);
+
+        string fullFileContent = frontmatter + "\n" + noteEditor.text;
+
+        File.WriteAllText(currentNotePath, fullFileContent);
     }
 
     public void RenameNote()
@@ -237,6 +278,44 @@ void Start()
 
         noteEditor.text = "";
         titleEditor.text = "";
+        currentNoteId = null;
+        currentNodeId = null;
         LoadNotes();
+    }
+
+    private string BuildFrontmatter(string id, string nodeId)
+    {
+        return
+        "---\nid: " + id + "\nnodeId: " + nodeId + "\n---";
+    }
+
+    private (string id, string nodeId, string content) ParseNoteFile(string text)
+    {
+        if (!text.StartsWith("---"))
+            return (null, null, text);
+
+        int end = text.IndexOf("---", 3);
+        if (end == -1)
+            return (null, null, text);
+
+        string frontmatter = text.Substring(3, end - 3);
+        string content = text.Substring(end + 3).TrimStart();
+
+        string id = null;
+        string nodeId = null;
+
+        foreach (var line in frontmatter.Split('\n'))
+        {
+            var parts = line.Split(':');
+            if (parts.Length < 2) continue;
+
+            string key = parts[0].Trim();
+            string value = parts[1].Trim();
+
+            if (key == "id") id = value;
+            if (key == "nodeId") nodeId = value;
+        }
+
+        return (id, nodeId, content);
     }
 }
