@@ -64,8 +64,16 @@ public class NodeEditorUI : MonoBehaviour
         priorityDropdown.value = node.priority;
         nodeSizeSlider.value = node.size;
 
-        notesManager.OpenNoteById(node.defaultNoteId); // Load text from note
-        notesManager.LoadNotesByList(node.noteIds);
+        if (!string.IsNullOrEmpty(node.defaultNoteId))
+        {
+            notesManager.OpenNoteById(node.defaultNoteId);
+        }
+        else
+        {
+            notesManager.ClearEditorUI();
+        }
+
+            notesManager.LoadNotesByList(node.noteIds);
 
         int typeIndex = typeDropdown.options.FindIndex(
             option => option.text == node.type);

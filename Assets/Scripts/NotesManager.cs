@@ -8,6 +8,8 @@ using System.Text.RegularExpressions;
 
 public class NotesManager : MonoBehaviour
 {
+    public MapDataManager dataManager;
+
     [Header("UI References")]
     public Transform notesListContent;
     public Transform nodeNotesListContent;
@@ -161,11 +163,15 @@ public class NotesManager : MonoBehaviour
             Directory.CreateDirectory(folderPath);
         }
 
-
         if (noteEditor != null) noteEditor.text = "";
         if (titleEditor != null) titleEditor.text = "";
 
         NoteRegistry.Rebuild(folderPath);
+
+        if (dataManager != null)
+        {
+            dataManager.ValidateNodeNotes();
+        }
 
         if (notesListContent != null) LoadNotes();
     }
@@ -334,16 +340,16 @@ public class NotesManager : MonoBehaviour
             File.Delete(currentNotePath);
         }
 
-        noteEditor.text = "";
-
-        if (titleEditor != null)
-        {
-            titleEditor.text = "";
-        }
-
-        currentNoteId = null;
-        currentNodeId = null;
+        ClearEditorUI();
         LoadNotes();
+    }
+
+    public void ClearEditorUI()
+    {
+        if (noteEditor != null) noteEditor.text = "";
+        if (titleEditor != null) titleEditor.text = "";
+        currentNoteId = "";
+        currentNotePath = "";
     }
 
     private string BuildFrontmatter(string id, string nodeId)

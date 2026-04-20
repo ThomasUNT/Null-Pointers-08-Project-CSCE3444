@@ -886,6 +886,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3f75b4f507fe9c4e9d24767cdd1c98f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NotesManager
+  dataManager: {fileID: 55223473}
   notesListContent: {fileID: 0}
   nodeNotesListContent: {fileID: 1085140105}
   noteButtonPrefab: {fileID: 2825385847797997283, guid: 48960415244825d409c475bbd0647689, type: 3}
