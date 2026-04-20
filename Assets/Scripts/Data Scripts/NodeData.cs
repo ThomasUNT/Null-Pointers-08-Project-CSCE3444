@@ -26,6 +26,7 @@ public class NodeData
         this.text = "";
 
         this.noteIds = new List<string>();
+        this.defaultNoteId = "";
         // reference to MapTextData entry for the title text of the node
         this.titleTextId = "";
 

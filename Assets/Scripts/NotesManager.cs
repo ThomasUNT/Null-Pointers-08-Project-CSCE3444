@@ -212,6 +212,8 @@ public class NotesManager : MonoBehaviour
 
         File.WriteAllText(fullPath, content); // Store IDs in new note file
 
+        NoteRegistry.UpdateEntry(id, fullPath);
+
         currentNotePath = fullPath;
         currentNoteId = id;
         currentNodeId = nodeId;
@@ -273,6 +275,9 @@ public class NotesManager : MonoBehaviour
         {
             File.Move(currentNotePath, newPath);
             currentNotePath = newPath;
+
+            // Update the registry with the new path
+            NoteRegistry.UpdateEntry(currentNoteId, newPath);
             LoadNotes();
         }
     }

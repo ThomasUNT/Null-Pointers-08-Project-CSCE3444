@@ -49,4 +49,18 @@ public static class NoteRegistry
         if (string.IsNullOrEmpty(guid)) return null;
         return Cache.TryGetValue(guid, out string path) ? path : null;
     }
+
+    public static void UpdateEntry(string id, string path)
+    {
+        if (string.IsNullOrEmpty(id)) return;
+
+        if (Cache.ContainsKey(id))
+        {
+            Cache[id] = path;
+        }
+        else
+        {
+            Cache.Add(id, path);
+        }
+    }
 }

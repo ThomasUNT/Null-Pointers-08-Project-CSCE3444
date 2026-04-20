@@ -39,6 +39,7 @@ public class NodeEditorUI : MonoBehaviour
     [SerializeField] private TMP_Dropdown textPriorityDropdown;
 
     [SerializeField] private MapDataManager dataManager;
+    [SerializeField] private NotesManager notesManager;
 
     private NodeData activeNode = null;
     private MapTextData activeText = null;
@@ -59,9 +60,11 @@ public class NodeEditorUI : MonoBehaviour
         mapTextEditorPanel.SetActive(false);
 
         // populate fields with data from json
-        inputField.text = node.text;
+        //inputField.text = node.text; Text now comes from notes
         priorityDropdown.value = node.priority;
         nodeSizeSlider.value = node.size;
+
+        notesManager.OpenNoteById(node.defaultNoteId); // Load text from note
 
         int typeIndex = typeDropdown.options.FindIndex(
             option => option.text == node.type);

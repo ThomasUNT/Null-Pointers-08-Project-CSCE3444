@@ -3112,6 +3112,7 @@ MonoBehaviour:
   textRotationSlider: {fileID: 1006358458}
   textPriorityDropdown: {fileID: 1906351487}
   dataManager: {fileID: 55223473}
+  notesManager: {fileID: 102778312}
 --- !u!1 &267252580
 GameObject:
   m_ObjectHideFlags: 0
