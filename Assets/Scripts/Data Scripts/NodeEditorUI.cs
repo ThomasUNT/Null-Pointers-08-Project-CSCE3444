@@ -91,6 +91,32 @@ public class NodeEditorUI : MonoBehaviour
         inputField.Select();
     }
 
+    public void CreateNewNoteForActiveNode()
+    {
+        if (activeNode == null)
+        {
+            Debug.LogError("No active node selected to attach a note to!");
+            return;
+        }
+
+        // Tell NotesManager to create the physical file.
+        string newNoteId = notesManager.CreateNote(activeNode.id);
+
+        // Add this ID to the node's list of associated notes.
+        if (!activeNode.noteIds.Contains(newNoteId))
+        {
+            activeNode.noteIds.Add(newNoteId);
+        }
+
+        // Persist the change to the JSON map data.
+        dataManager.Save();
+
+        // Refresh the UI list in the Node Panel so the new button appears.
+        notesManager.LoadNotesByList(activeNode.noteIds);
+
+        Debug.Log($"Created new note {newNoteId} for node {activeNode.id}");
+    }
+
     public void SaveNodeText()
     {
         if (activeNode == null) return;
