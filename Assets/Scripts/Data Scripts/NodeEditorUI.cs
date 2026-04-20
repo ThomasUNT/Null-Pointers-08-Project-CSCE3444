@@ -117,6 +117,55 @@ public class NodeEditorUI : MonoBehaviour
         Debug.Log($"Created new note {newNoteId} for node {activeNode.id}");
     }
 
+    public void DeleteActiveNote()
+    {
+        // Get the ID of the note currently being edited
+        string idToDelete = notesManager.GetCurrentNoteId();
+        if (string.IsNullOrEmpty(idToDelete) || activeNode == null) return;
+
+        // Deletion via NotesManager
+        notesManager.DeleteNote();
+
+        // Update Registry
+        NoteRegistry.RemoveEntry(idToDelete);
+
+        // Update Node Data List
+        if (activeNode.noteIds.Contains(idToDelete))
+        {
+            activeNode.noteIds.Remove(idToDelete);
+        }
+
+        // Handle Default Note Logic
+        if (activeNode.defaultNoteId == idToDelete)
+        {
+            if (activeNode.noteIds.Count > 0)
+            {
+                activeNode.defaultNoteId = activeNode.noteIds[0];
+                // Automatically open the new default note
+                notesManager.OpenNoteById(activeNode.defaultNoteId);
+            }
+            else
+            {
+                activeNode.defaultNoteId = "";
+            }
+        }
+
+        // Save and Refresh
+        dataManager.Save();
+        notesManager.LoadNotesByList(activeNode.noteIds);
+    }
+
+    public void SetCurrentAsDefault()
+    {
+        string currentId = notesManager.GetCurrentNoteId();
+        if (string.IsNullOrEmpty(currentId) || activeNode == null) return;
+
+        activeNode.defaultNoteId = currentId;
+
+        dataManager.Save();
+        Debug.Log($"Note {currentId} set as default for Node {activeNode.id}");
+    }
+
     public void SaveNodeText()
     {
         if (activeNode == null) return;

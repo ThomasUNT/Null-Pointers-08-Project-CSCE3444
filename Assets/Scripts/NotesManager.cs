@@ -293,6 +293,11 @@ public class NotesManager : MonoBehaviour
         }
     }
 
+    public string GetCurrentNoteId()
+    {
+        return currentNoteId;
+    }
+
     public void SaveNote()
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
@@ -330,7 +335,12 @@ public class NotesManager : MonoBehaviour
         }
 
         noteEditor.text = "";
-        titleEditor.text = "";
+
+        if (titleEditor != null)
+        {
+            titleEditor.text = "";
+        }
+
         currentNoteId = null;
         currentNodeId = null;
         LoadNotes();

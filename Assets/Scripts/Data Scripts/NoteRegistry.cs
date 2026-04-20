@@ -63,4 +63,14 @@ public static class NoteRegistry
             Cache.Add(id, path);
         }
     }
+
+    public static void RemoveEntry(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return;
+
+        if (Cache.ContainsKey(id))
+        {
+            Cache.Remove(id);
+        }
+    }
 }
