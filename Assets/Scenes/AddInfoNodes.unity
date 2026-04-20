@@ -887,9 +887,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NotesManager
   notesListContent: {fileID: 0}
+  nodeNotesListContent: {fileID: 1085140105}
   noteButtonPrefab: {fileID: 2825385847797997283, guid: 7dc9bd7912afcad4587469611c3a732c, type: 3}
   noteEditor: {fileID: 1318254312}
-  titleEditor: {fileID: 2010850023}
+  titleEditor: {fileID: 0}
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   currentMapName: 
   sizeStep: 50

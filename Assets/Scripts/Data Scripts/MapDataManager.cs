@@ -86,7 +86,7 @@ public class MapDataManager : MonoBehaviour
         return node;
     }
 
-    // Temporary - this will eventually be moved to the Note Manager
+/*    // Temporary - this will eventually be moved to the Note Manager
     private string RequestNewNote(string parentNodeId)
     {
         string newGuid = System.Guid.NewGuid().ToString();
@@ -96,7 +96,7 @@ public class MapDataManager : MonoBehaviour
 
         Debug.Log($"Node {parentNodeId} is waiting for Note {newGuid} to be created.");
         return newGuid;
-    }
+    }*/
 
     public MapTextData AddText(Vector2 position)
     {

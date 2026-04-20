@@ -10,6 +10,7 @@ public class NotesManager : MonoBehaviour
 {
     [Header("UI References")]
     public Transform notesListContent;
+    public Transform nodeNotesListContent;
     public GameObject noteButtonPrefab;
     public TMP_InputField noteEditor;
     public TMP_InputField titleEditor;
@@ -191,6 +192,39 @@ public class NotesManager : MonoBehaviour
         }
     }
 
+    public void LoadNotesByList(List<string> noteIds)
+    {
+        if (nodeNotesListContent == null) return;
+
+        // Clear old buttons
+        foreach (Transform child in nodeNotesListContent)
+            Destroy(child.gameObject);
+
+        if (noteIds == null || noteIds.Count == 0) return;
+
+        // Loop through the specific IDs this node owns
+        foreach (string id in noteIds)
+        {
+            string path = NoteRegistry.GetPath(id);
+
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+            {
+                // Create the button
+                GameObject btn = Instantiate(noteButtonPrefab, nodeNotesListContent);
+
+                string fileName = Path.GetFileNameWithoutExtension(path);
+                btn.GetComponentInChildren<TMP_Text>().text = fileName;
+
+                // Hook up the click event
+                btn.GetComponent<Button>().onClick.AddListener(() => OpenNote(path));
+            }
+            else
+            {
+                Debug.LogWarning($"Note ID {id} found in Node, but path is missing from Registry/Disk.");
+            }
+        }
+    }
+
     public string CreateNote(string nodeId)
     {
         if (string.IsNullOrEmpty(folderPath)) InitializeNotes();
@@ -231,7 +265,12 @@ public class NotesManager : MonoBehaviour
     void OpenNote(string path)
     {
         currentNotePath = path;
-        titleEditor.text = Path.GetFileNameWithoutExtension(path);
+
+        if (titleEditor != null)
+        {
+            titleEditor.text = Path.GetFileNameWithoutExtension(path);
+        }
+
         string rawText = File.ReadAllText(path);
         var parsed = ParseNoteFile(rawText);
 
