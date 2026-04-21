@@ -44,9 +44,6 @@ public class NodeEditorUI : MonoBehaviour
     private NodeData activeNode = null;
     private MapTextData activeText = null;
 
-    //private int activeNodeIndex = -1;
-    //private int activeTextIndex = -1;
-
 
     // ------------------------------ Node Editor Methods ---------------------------------
 
@@ -60,7 +57,6 @@ public class NodeEditorUI : MonoBehaviour
         mapTextEditorPanel.SetActive(false);
 
         // populate fields with data from json
-        //inputField.text = node.text; Text now comes from notes
         priorityDropdown.value = node.priority;
         nodeSizeSlider.value = node.size;
 

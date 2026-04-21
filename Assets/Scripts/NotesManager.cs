@@ -218,11 +218,15 @@ public class NotesManager : MonoBehaviour
                 // Create the button
                 GameObject btn = Instantiate(noteButtonPrefab, nodeNotesListContent);
 
+                var renameScript = btn.GetComponent<RenameableNoteButton>();
+
                 string fileName = Path.GetFileNameWithoutExtension(path);
-                btn.GetComponentInChildren<TMP_Text>().text = fileName;
+
+                renameScript.Initialize(id, fileName, this);
+/*                btn.GetComponentInChildren<TMP_Text>().text = fileName;
 
                 // Hook up the click event
-                btn.GetComponent<Button>().onClick.AddListener(() => OpenNote(path));
+                btn.GetComponent<Button>().onClick.AddListener(() => OpenNote(path));*/
             }
             else
             {
@@ -329,6 +333,30 @@ public class NotesManager : MonoBehaviour
             // Update the registry with the new path
             NoteRegistry.UpdateEntry(currentNoteId, newPath);
             LoadNotes();
+        }
+    }
+
+    public void RenameNoteById(string id, string newName)
+    {
+        string oldPath = NoteRegistry.GetPath(id);
+        if (string.IsNullOrEmpty(oldPath) || !File.Exists(oldPath)) return;
+
+        string folder = Path.GetDirectoryName(oldPath);
+        string newPath = Path.Combine(folder, newName + ".md");
+
+        if (oldPath != newPath && !File.Exists(newPath))
+        {
+            File.Move(oldPath, newPath);
+
+            // Update Registry
+            NoteRegistry.UpdateEntry(id, newPath);
+
+            // If this was the note we currently have open, update our pointers
+            if (currentNoteId == id)
+            {
+                currentNotePath = newPath;
+                if (titleEditor != null) titleEditor.text = newName;
+            }
         }
     }
 
