@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine.UI;
 using System.IO;
 using System.Collections.Generic;
-using UnityEditor.Rendering;
 using System.Text.RegularExpressions;
 
 public class NotesManager : MonoBehaviour

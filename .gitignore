@@ -25,3 +25,5 @@ Recordings/
 *.vsconfig
 *.vscode
 /.vs
+/[Pp]erformanceTestRunInfo.json*
+/[Pp]erformanceTestRunSettings.json*
