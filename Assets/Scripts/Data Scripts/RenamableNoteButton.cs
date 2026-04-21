@@ -57,8 +57,11 @@ public class RenameableNoteButton : MonoBehaviour, IPointerClickHandler
         // Avoid renaming to empty
         if (!string.IsNullOrEmpty(newName) && newName != labelText.text)
         {
-            manager.RenameNoteById(noteId, newName);
+            string actualName = manager.RenameNoteById(noteId, newName);
+
+            // Update the label to display any appended digits to file name to avoid duplicates
             labelText.text = newName;
+            editField.text = actualName;
         }
 
         editField.gameObject.SetActive(false);

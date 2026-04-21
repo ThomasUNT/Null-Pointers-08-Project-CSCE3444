@@ -223,10 +223,6 @@ public class NotesManager : MonoBehaviour
                 string fileName = Path.GetFileNameWithoutExtension(path);
 
                 renameScript.Initialize(id, fileName, this);
-/*                btn.GetComponentInChildren<TMP_Text>().text = fileName;
-
-                // Hook up the click event
-                btn.GetComponent<Button>().onClick.AddListener(() => OpenNote(path));*/
             }
             else
             {
@@ -239,23 +235,13 @@ public class NotesManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(folderPath)) InitializeNotes();
 
-        int noteIndex = 0;
-        string fileName;
-        string fullPath;
-
-        do
-        {
-            fileName = "note" + noteIndex;
-            fullPath = Path.Combine(folderPath, fileName + ".md");
-            noteIndex++;
-        }
-        while (File.Exists(fullPath));
+        string finalName;
+        string fullPath = GetUniquePath(folderPath, "note", out finalName);
 
         string id = System.Guid.NewGuid().ToString();
         string content = BuildFrontmatter(id, nodeId);
 
-        File.WriteAllText(fullPath, content); // Store IDs in new note file
-
+        File.WriteAllText(fullPath, content);
         NoteRegistry.UpdateEntry(id, fullPath);
 
         currentNotePath = fullPath;
@@ -265,6 +251,24 @@ public class NotesManager : MonoBehaviour
         LoadNotes();
         OpenNote(fullPath);
         return id;
+    }
+
+    private string GetUniquePath(string folder, string baseName, out string finalName)
+    {
+        string fileName = baseName;
+        string fullPath = Path.Combine(folder, fileName + ".md");
+        int counter = 1;
+
+        // Check if the file already exists. If so, append digit
+        while (File.Exists(fullPath))
+        {
+            fileName = $"{baseName} {counter}";
+            fullPath = Path.Combine(folder, fileName + ".md");
+            counter++;
+        }
+
+        finalName = fileName;
+        return fullPath;
     }
 
     public void CreateNoteFromButton()
@@ -323,41 +327,46 @@ public class NotesManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
 
-        string newPath = Path.Combine(folderPath, titleEditor.text + ".md");
+        string desiredName = titleEditor.text;
 
-        if (currentNotePath != newPath && !File.Exists(newPath))
-        {
-            File.Move(currentNotePath, newPath);
-            currentNotePath = newPath;
+        // If the name hasn't actually changed, don't do anything
+        if (Path.GetFileNameWithoutExtension(currentNotePath) == desiredName) return;
 
-            // Update the registry with the new path
-            NoteRegistry.UpdateEntry(currentNoteId, newPath);
-            LoadNotes();
-        }
+        string finalName;
+        string newPath = GetUniquePath(folderPath, desiredName, out finalName);
+
+        File.Move(currentNotePath, newPath);
+        currentNotePath = newPath;
+
+        // Update UI to match the final filename
+        titleEditor.text = finalName;
+
+        NoteRegistry.UpdateEntry(currentNoteId, newPath);
+        LoadNotes();
     }
 
-    public void RenameNoteById(string id, string newName)
+    public string RenameNoteById(string id, string newName)
     {
         string oldPath = NoteRegistry.GetPath(id);
-        if (string.IsNullOrEmpty(oldPath) || !File.Exists(oldPath)) return;
+        if (string.IsNullOrEmpty(oldPath) || !File.Exists(oldPath)) return newName;
+
+        // If the name hasn't changed, just return
+        if (Path.GetFileNameWithoutExtension(oldPath) == newName) return newName;
 
         string folder = Path.GetDirectoryName(oldPath);
-        string newPath = Path.Combine(folder, newName + ".md");
+        string finalName;
+        string newPath = GetUniquePath(folder, newName, out finalName);
 
-        if (oldPath != newPath && !File.Exists(newPath))
+        File.Move(oldPath, newPath);
+        NoteRegistry.UpdateEntry(id, newPath);
+
+        if (currentNoteId == id)
         {
-            File.Move(oldPath, newPath);
-
-            // Update Registry
-            NoteRegistry.UpdateEntry(id, newPath);
-
-            // If this was the note we currently have open, update our pointers
-            if (currentNoteId == id)
-            {
-                currentNotePath = newPath;
-                if (titleEditor != null) titleEditor.text = newName;
-            }
+            currentNotePath = newPath;
+            if (titleEditor != null) titleEditor.text = finalName;
         }
+
+        return finalName; // Return the name (possibly with digit appended)
     }
 
     public void DeleteNote()
