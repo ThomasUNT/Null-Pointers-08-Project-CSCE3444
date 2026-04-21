@@ -39,12 +39,10 @@ public class NodeEditorUI : MonoBehaviour
     [SerializeField] private TMP_Dropdown textPriorityDropdown;
 
     [SerializeField] private MapDataManager dataManager;
+    [SerializeField] private NotesManager notesManager;
 
     private NodeData activeNode = null;
     private MapTextData activeText = null;
-
-    //private int activeNodeIndex = -1;
-    //private int activeTextIndex = -1;
 
 
     // ------------------------------ Node Editor Methods ---------------------------------
@@ -59,9 +57,19 @@ public class NodeEditorUI : MonoBehaviour
         mapTextEditorPanel.SetActive(false);
 
         // populate fields with data from json
-        inputField.text = node.text;
         priorityDropdown.value = node.priority;
         nodeSizeSlider.value = node.size;
+
+        if (!string.IsNullOrEmpty(node.defaultNoteId))
+        {
+            notesManager.OpenNoteById(node.defaultNoteId);
+        }
+        else
+        {
+            notesManager.ClearEditorUI();
+        }
+
+            notesManager.LoadNotesByList(node.noteIds);
 
         int typeIndex = typeDropdown.options.FindIndex(
             option => option.text == node.type);
@@ -85,6 +93,81 @@ public class NodeEditorUI : MonoBehaviour
         // focus cursor automatically
         inputField.ActivateInputField();
         inputField.Select();
+    }
+
+    public void CreateNewNoteForActiveNode()
+    {
+        if (activeNode == null)
+        {
+            Debug.LogError("No active node selected to attach a note to!");
+            return;
+        }
+
+        // Tell NotesManager to create the physical file.
+        string newNoteId = notesManager.CreateNote(activeNode.id);
+
+        // Add this ID to the node's list of associated notes.
+        if (!activeNode.noteIds.Contains(newNoteId))
+        {
+            activeNode.noteIds.Add(newNoteId);
+        }
+
+        // Persist the change to the JSON map data.
+        dataManager.Save();
+
+        // Refresh the UI list in the Node Panel so the new button appears.
+        notesManager.LoadNotesByList(activeNode.noteIds);
+
+        Debug.Log($"Created new note {newNoteId} for node {activeNode.id}");
+    }
+
+    public void DeleteActiveNote()
+    {
+        // Get the ID of the note currently being edited
+        string idToDelete = notesManager.GetCurrentNoteId();
+        if (string.IsNullOrEmpty(idToDelete) || activeNode == null) return;
+
+        // Deletion via NotesManager
+        notesManager.DeleteNote();
+
+        // Update Registry
+        NoteRegistry.RemoveEntry(idToDelete);
+
+        // Update Node Data List
+        if (activeNode.noteIds.Contains(idToDelete))
+        {
+            activeNode.noteIds.Remove(idToDelete);
+        }
+
+        // Handle Default Note Logic
+        if (activeNode.defaultNoteId == idToDelete)
+        {
+            if (activeNode.noteIds.Count > 0)
+            {
+                activeNode.defaultNoteId = activeNode.noteIds[0];
+                // Automatically open the new default note
+                notesManager.OpenNoteById(activeNode.defaultNoteId);
+            }
+            else
+            {
+                activeNode.defaultNoteId = "";
+            }
+        }
+
+        // Save and Refresh
+        dataManager.Save();
+        notesManager.LoadNotesByList(activeNode.noteIds);
+    }
+
+    public void SetCurrentAsDefault()
+    {
+        string currentId = notesManager.GetCurrentNoteId();
+        if (string.IsNullOrEmpty(currentId) || activeNode == null) return;
+
+        activeNode.defaultNoteId = currentId;
+
+        dataManager.Save();
+        Debug.Log($"Note {currentId} set as default for Node {activeNode.id}");
     }
 
     public void SaveNodeText()

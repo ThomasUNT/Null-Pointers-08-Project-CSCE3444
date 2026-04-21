@@ -14,6 +14,7 @@ public class MapDataManager : MonoBehaviour
     public GameObject nodeIconPrefab;
     public GameObject mapTextPrefab;
     public NodeEditorUI editorUI;
+    public NotesManager noteManager;
     public int defaultNodeSizeMultiplier = 1;
 
     [Header("Node Type Sprites")]
@@ -72,6 +73,12 @@ public class MapDataManager : MonoBehaviour
     public NodeData AddNode(Vector2 position)
     {
         NodeData node = new NodeData(position.x, position.y);
+
+        string newNoteId = noteManager.CreateNote(node.id);
+
+        node.noteIds.Add(newNoteId);
+        node.defaultNoteId = newNoteId;
+
         mapData.nodes.Add(node);
         //Save(); 
         DrawNodes();
@@ -238,6 +245,42 @@ public class MapDataManager : MonoBehaviour
             return true;
 
         return normalizedZoom >= priorityThresholds[priority];
+    }
+
+    public void ValidateNodeNotes()
+    {
+        bool dataWasCleaned = false;
+
+        foreach (var node in mapData.nodes)
+        {
+            // Remove any IDs from the list that aren't in the Registry
+            int originalCount = node.noteIds.Count;
+
+            // RemoveAll returns the number of elements removed
+            node.noteIds.RemoveAll(id => string.IsNullOrEmpty(NoteRegistry.GetPath(id)));
+
+            if (node.noteIds.Count != originalCount)
+                dataWasCleaned = true;
+
+            // Validate the Default Note ID
+            if (!string.IsNullOrEmpty(node.defaultNoteId))
+            {
+                // If the default note is missing from the registry
+                if (string.IsNullOrEmpty(NoteRegistry.GetPath(node.defaultNoteId)))
+                {
+                    // Reassign to the first available note in the list, or empty if none left
+                    node.defaultNoteId = (node.noteIds.Count > 0) ? node.noteIds[0] : "";
+                    dataWasCleaned = true;
+                }
+            }
+        }
+
+        // If we found and removed "ghost" notes, save the json
+        if (dataWasCleaned)
+        {
+            Save();
+            Debug.Log("MapDataManager: Cleaned up ghost note references from JSON.");
+        }
     }
 
     public void Save()

@@ -8,8 +8,11 @@ using System.Text.RegularExpressions;
 
 public class NotesManager : MonoBehaviour
 {
+    public MapDataManager dataManager;
+
     [Header("UI References")]
     public Transform notesListContent;
+    public Transform nodeNotesListContent;
     public GameObject noteButtonPrefab;
     public TMP_InputField noteEditor;
     public TMP_InputField titleEditor;
@@ -22,6 +25,9 @@ public class NotesManager : MonoBehaviour
 
     private string folderPath;
     private string currentNotePath;
+
+    private string currentNoteId;
+    private string currentNodeId;
 
     [Header("Font Settings")]
     public float sizeStep = 50f; //Step size for font resizing
@@ -46,9 +52,9 @@ public class NotesManager : MonoBehaviour
 
         if (match.Success)
         {
-            if (float.TryParse(match.Groups[1].Value, out currentSize)) ;
+            float.TryParse(match.Groups[1].Value, out currentSize);
         }
-            
+
         float targetSize = currentSize + amount;
 
         string cleanedText = Regex.Replace(selectedText, @"<size=[\d\.]+>|<\/size>", string.Empty);
@@ -64,14 +70,21 @@ public class NotesManager : MonoBehaviour
         SaveNote(); //Auto-save after resizing
     }
 
-void Start()
+    void Start()
     {
-        noteEditor.richText = true; //Allows rich text formatting
+        if (noteEditor != null)
+        {
+            noteEditor.richText = true; //Allows rich text formatting
+            noteEditor.onEndEdit.AddListener(delegate { SaveNote(); });
+        }
+
+        if (titleEditor != null)
+        {
+            titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
+        }
 
         SetMap(PlayerPrefs.GetString("LastMapFolder", ""));
         InitializeNotes();
-        noteEditor.onEndEdit.AddListener(delegate { SaveNote(); });
-        titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
     }
 
     public void FormatBold() => ApplyTag("<b>", "</b>");
@@ -110,6 +123,7 @@ void Start()
 
         SaveNote(); //Auto-save after formatting
     }
+
     //CLEAR FORMATTING BUTTON
     public void ClearSelectedFormatting()
     {
@@ -120,7 +134,6 @@ void Start()
 
         string text = noteEditor.text;
         string selectedText = text.Substring(start, end - start);
-
 
         string plainText = Regex.Replace(selectedText, "<[^>]*>", string.Empty);
 
@@ -150,15 +163,23 @@ void Start()
             Directory.CreateDirectory(folderPath);
         }
 
+        if (noteEditor != null) noteEditor.text = "";
+        if (titleEditor != null) titleEditor.text = "";
 
-        noteEditor.text = "";
-        titleEditor.text = "";
+        NoteRegistry.Rebuild(folderPath);
 
-        LoadNotes();
+        if (dataManager != null)
+        {
+            dataManager.ValidateNodeNotes();
+        }
+
+        if (notesListContent != null) LoadNotes();
     }
 
     public void LoadNotes()
     {
+        if (notesListContent == null) return;
+
         foreach (Transform child in notesListContent)
             Destroy(child.gameObject);
 
@@ -177,54 +198,175 @@ void Start()
         }
     }
 
-    public void CreateNote()
+    public void LoadNotesByList(List<string> noteIds)
+    {
+        if (nodeNotesListContent == null) return;
+
+        // Clear old buttons
+        foreach (Transform child in nodeNotesListContent)
+            Destroy(child.gameObject);
+
+        if (noteIds == null || noteIds.Count == 0) return;
+
+        // Loop through the specific IDs this node owns
+        foreach (string id in noteIds)
+        {
+            string path = NoteRegistry.GetPath(id);
+
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+            {
+                // Create the button
+                GameObject btn = Instantiate(noteButtonPrefab, nodeNotesListContent);
+
+                var renameScript = btn.GetComponent<RenameableNoteButton>();
+
+                string fileName = Path.GetFileNameWithoutExtension(path);
+
+                renameScript.Initialize(id, fileName, this);
+            }
+            else
+            {
+                Debug.LogWarning($"Note ID {id} found in Node, but path is missing from Registry/Disk.");
+            }
+        }
+    }
+
+    public string CreateNote(string nodeId)
     {
         if (string.IsNullOrEmpty(folderPath)) InitializeNotes();
 
-        int noteIndex = 0;
-        string fileName;
-        string fullPath;
+        string finalName;
+        string fullPath = GetUniquePath(folderPath, "note", out finalName);
 
-        do
-        {
-            fileName = "note" + noteIndex;
-            fullPath = Path.Combine(folderPath, fileName + ".md");
-            noteIndex++;
-        }
-        while (File.Exists(fullPath));
+        string id = System.Guid.NewGuid().ToString();
+        string content = BuildFrontmatter(id, nodeId);
 
-        File.WriteAllText(fullPath, ""); // Create empty note file
+        File.WriteAllText(fullPath, content);
+        NoteRegistry.UpdateEntry(id, fullPath);
 
         currentNotePath = fullPath;
+        currentNoteId = id;
+        currentNodeId = nodeId;
+
         LoadNotes();
         OpenNote(fullPath);
+        return id;
+    }
+
+    private string GetUniquePath(string folder, string baseName, out string finalName)
+    {
+        string fileName = baseName;
+        string fullPath = Path.Combine(folder, fileName + ".md");
+        int counter = 1;
+
+        // Check if the file already exists. If so, append digit
+        while (File.Exists(fullPath))
+        {
+            fileName = $"{baseName} {counter}";
+            fullPath = Path.Combine(folder, fileName + ".md");
+            counter++;
+        }
+
+        finalName = fileName;
+        return fullPath;
+    }
+
+    public void CreateNoteFromButton()
+    {
+        CreateNote("");
     }
 
     void OpenNote(string path)
     {
         currentNotePath = path;
-        titleEditor.text = Path.GetFileNameWithoutExtension(path);
-        noteEditor.text = File.ReadAllText(path);
+
+        if (titleEditor != null)
+        {
+            titleEditor.text = Path.GetFileNameWithoutExtension(path);
+        }
+
+        string rawText = File.ReadAllText(path);
+        var parsed = ParseNoteFile(rawText);
+
+        currentNoteId = parsed.id;
+        currentNodeId = parsed.nodeId;
+
+        noteEditor.text = parsed.content;
+    }
+
+    public void OpenNoteById(string noteId)
+    {
+        string path = NoteRegistry.GetPath(noteId);
+        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+        {
+            OpenNote(path);
+        }
+        else
+        {
+            Debug.LogError($"Note with ID {noteId} not found in Registry!");
+        }
+    }
+
+    public string GetCurrentNoteId()
+    {
+        return currentNoteId;
     }
 
     public void SaveNote()
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
-        File.WriteAllText(currentNotePath, noteEditor.text);
+
+        string frontmatter = BuildFrontmatter(currentNoteId, currentNodeId);
+
+        string fullFileContent = frontmatter + "\n" + noteEditor.text;
+
+        File.WriteAllText(currentNotePath, fullFileContent);
     }
 
     public void RenameNote()
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
 
-        string newPath = Path.Combine(folderPath, titleEditor.text + ".md");
+        string desiredName = titleEditor.text;
 
-        if (currentNotePath != newPath && !File.Exists(newPath))
+        // If the name hasn't actually changed, don't do anything
+        if (Path.GetFileNameWithoutExtension(currentNotePath) == desiredName) return;
+
+        string finalName;
+        string newPath = GetUniquePath(folderPath, desiredName, out finalName);
+
+        File.Move(currentNotePath, newPath);
+        currentNotePath = newPath;
+
+        // Update UI to match the final filename
+        titleEditor.text = finalName;
+
+        NoteRegistry.UpdateEntry(currentNoteId, newPath);
+        LoadNotes();
+    }
+
+    public string RenameNoteById(string id, string newName)
+    {
+        string oldPath = NoteRegistry.GetPath(id);
+        if (string.IsNullOrEmpty(oldPath) || !File.Exists(oldPath)) return newName;
+
+        // If the name hasn't changed, just return
+        if (Path.GetFileNameWithoutExtension(oldPath) == newName) return newName;
+
+        string folder = Path.GetDirectoryName(oldPath);
+        string finalName;
+        string newPath = GetUniquePath(folder, newName, out finalName);
+
+        File.Move(oldPath, newPath);
+        NoteRegistry.UpdateEntry(id, newPath);
+
+        if (currentNoteId == id)
         {
-            File.Move(currentNotePath, newPath);
             currentNotePath = newPath;
-            LoadNotes();
+            if (titleEditor != null) titleEditor.text = finalName;
         }
+
+        return finalName; // Return the name (possibly with digit appended)
     }
 
     public void DeleteNote()
@@ -235,8 +377,51 @@ void Start()
             File.Delete(currentNotePath);
         }
 
-        noteEditor.text = "";
-        titleEditor.text = "";
+        ClearEditorUI();
         LoadNotes();
+    }
+
+    public void ClearEditorUI()
+    {
+        if (noteEditor != null) noteEditor.text = "";
+        if (titleEditor != null) titleEditor.text = "";
+        currentNoteId = "";
+        currentNotePath = "";
+    }
+
+    private string BuildFrontmatter(string id, string nodeId)
+    {
+        return
+        "---\nid: " + id + "\nnodeId: " + nodeId + "\n---";
+    }
+
+    private (string id, string nodeId, string content) ParseNoteFile(string text)
+    {
+        if (!text.StartsWith("---"))
+            return (null, null, text);
+
+        int end = text.IndexOf("---", 3);
+        if (end == -1)
+            return (null, null, text);
+
+        string frontmatter = text.Substring(3, end - 3);
+        string content = text.Substring(end + 3).TrimStart();
+
+        string id = null;
+        string nodeId = null;
+
+        foreach (var line in frontmatter.Split('\n'))
+        {
+            var parts = line.Split(':');
+            if (parts.Length < 2) continue;
+
+            string key = parts[0].Trim();
+            string value = parts[1].Trim();
+
+            if (key == "id") id = value;
+            if (key == "nodeId") nodeId = value;
+        }
+
+        return (id, nodeId, content);
     }
 }
