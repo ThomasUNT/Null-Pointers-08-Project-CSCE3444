@@ -283,6 +283,46 @@ public class MapDataManager : MonoBehaviour
         }
     }
 
+    public void SavePositionsOnly(string nodeId, string textId)
+    {
+        if (!File.Exists(filePath)) return;
+
+        // Load a clean copy from the disk (ignoring the changes in memory)
+        string json = File.ReadAllText(filePath);
+        MapData diskData = JsonUtility.FromJson<MapData>(json);
+
+        // Sync Node position if applicable
+        if (!string.IsNullOrEmpty(nodeId))
+        {
+            NodeData diskNode = diskData.nodes.Find(n => n.id == nodeId);
+            NodeData liveNode = mapData.nodes.Find(n => n.id == nodeId);
+
+            if (diskNode != null && liveNode != null)
+            {
+                diskNode.x = liveNode.x;
+                diskNode.y = liveNode.y;
+            }
+        }
+
+        // Sync Text/Title position if applicable
+        if (!string.IsNullOrEmpty(textId))
+        {
+            MapTextData diskText = diskData.mapTexts.Find(t => t.id == textId);
+            MapTextData liveText = mapData.mapTexts.Find(t => t.id == textId);
+
+            if (diskText != null && liveText != null)
+            {
+                diskText.x = liveText.x;
+                diskText.y = liveText.y;
+            }
+        }
+
+        // Save the modified clean copy back to disk
+        string updatedJson = JsonUtility.ToJson(diskData, true);
+        File.WriteAllText(filePath, updatedJson);
+        Debug.Log("Position-only save completed.");
+    }
+
     public void Save()
     {
         string json = JsonUtility.ToJson(mapData, true);

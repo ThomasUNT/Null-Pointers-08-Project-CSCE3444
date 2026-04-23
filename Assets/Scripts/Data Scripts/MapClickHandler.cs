@@ -212,10 +212,28 @@ public class MapClickHandler : MonoBehaviour
         {
             isDragging = false;
 
+            string finalNodeId = "";
+            string finalTextId = "";
+
+            // Identify which IDs were involved in this move
+            if (draggingNode != null)
+            {
+                finalNodeId = draggingNode.id;
+                finalTextId = draggingNode.titleTextId;
+            }
+            else if (draggingText != null)
+            {
+                finalTextId = draggingText.id;
+                // Check if this text belongs to a node
+                NodeData ownerNode = dataManager.mapData.nodes.Find(n => n.titleTextId == finalTextId);
+                if (ownerNode != null) finalNodeId = ownerNode.id;
+            }
+
+            // Save only the position updates
+            dataManager.SavePositionsOnly(finalNodeId, finalTextId);
+
             draggingNode = null;
             draggingText = null;
-
-            dataManager.Save();
         }
     }
 }
