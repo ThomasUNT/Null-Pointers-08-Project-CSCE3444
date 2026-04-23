@@ -6,8 +6,10 @@ public class CursorManager : MonoBehaviour
     [Header("References")]
     public MapDrawHandler drawHandler;
     public RectTransform brushPreview; // Cursor image
+    public Material cursorMat;  // To set cursor thickness
     public RectTransform mapWindow;
     public Image previewImage; // To toggle visibility
+    public float cursorThickness;  // Thickness of brush, in pixels
 
     private RectTransform canvasRect;
 
@@ -66,5 +68,8 @@ public class CursorManager : MonoBehaviour
         float scaledSize = drawHandler.brushSize * currentScale * 1.6f;
 
         brushPreview.sizeDelta = new Vector2(scaledSize, scaledSize);
+
+        // Update brush thickness. Assumes max is already set to 1.0
+        cursorMat.SetFloat("_Min", System.Math.Max((scaledSize - cursorThickness) / scaledSize, 0));
     }
 }
