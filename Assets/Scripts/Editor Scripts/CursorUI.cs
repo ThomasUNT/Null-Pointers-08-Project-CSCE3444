@@ -66,10 +66,11 @@ public class CursorManager : MonoBehaviour
         // Calculate Size
         float currentScale = drawHandler.mapRect.localScale.x;
         float scaledSize = drawHandler.brushSize * currentScale * 1.6f;
+        scaledSize = System.Math.Max(scaledSize, cursorThickness * 2);
 
         brushPreview.sizeDelta = new Vector2(scaledSize, scaledSize);
 
         // Update brush thickness. Assumes max is already set to 1.0
-        cursorMat.SetFloat("_Min", System.Math.Max((scaledSize - cursorThickness) / scaledSize, 0));
+        cursorMat.SetFloat("_Min", System.Math.Max((scaledSize - (cursorThickness * 2)) / scaledSize, 0));
     }
 }
