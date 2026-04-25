@@ -40,6 +40,7 @@ public class NodeEditorUI : MonoBehaviour
 
     [SerializeField] private MapDataManager dataManager;
     [SerializeField] private NotesManager notesManager;
+    [SerializeField] private ColorPickerPanel colorPicker;
 
     private NodeData activeNode = null;
     private MapTextData activeText = null;
@@ -428,6 +429,22 @@ public class NodeEditorUI : MonoBehaviour
         isInitializing = false;
     }
 
+    public void OnPickMapTextColorClicked()
+    {
+        if (activeText == null) return;
+
+        if (colorPicker.gameObject.activeSelf)
+        {
+            colorPicker.Close();
+            return;
+        }
+
+        // Pass the current color and a set of instructions on what to do when it changes
+        colorPicker.Initialize(activeText.GetColor(), (newColor) => {
+            activeText.colorHex = "#" + ColorUtility.ToHtmlStringRGB(newColor);
+            dataManager.DrawMapTexts(); // Live preview
+        });
+    }
 
     public void saveTitleEditor()
     {
@@ -447,6 +464,7 @@ public class NodeEditorUI : MonoBehaviour
     {
         titleEditorPanel.SetActive(false);
         buttonPanel.SetActive(true);
+        colorPicker.Close();
         activeText = null;
     }
 
@@ -506,6 +524,7 @@ public class NodeEditorUI : MonoBehaviour
     {
         mapTextEditorPanel.SetActive(false);
         buttonPanel.SetActive(true);
+        colorPicker.Close();
         activeText = null;
     }
 

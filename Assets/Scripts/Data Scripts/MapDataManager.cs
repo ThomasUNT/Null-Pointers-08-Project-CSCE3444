@@ -209,6 +209,7 @@ public class MapDataManager : MonoBehaviour
             TMPro.TMP_Text tmp = textObj.GetComponent<TMPro.TMP_Text>();
             tmp.text = textData.content;
             tmp.fontSize = textData.fontSize;
+            tmp.color = textData.GetColor();
 
             // Rotation
             textObj.transform.localRotation = Quaternion.Euler(0, 0, textData.rotation);

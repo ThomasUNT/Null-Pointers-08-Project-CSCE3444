@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System;
 
-public class ColorPickerPanel : MonoBehaviour
+public class ColorPickerPanel : MonoBehaviour, IDragHandler, IPointerDownHandler
 {
     [Header("Sliders")]
     public Slider hueSlider;
@@ -11,16 +13,36 @@ public class ColorPickerPanel : MonoBehaviour
     [Header("Visuals")]
     public Image previewImage;
     public Image satOverlayImage; // The transparent-to-solid gradient layer
-    public Image valOverlayImage; // The transparent-to-solid gradient layer
+    public Image valOverlayImage; // The transparent-to-solid gradient
 
-    void Start()
+    private RectTransform rectTransform;
+    public Action<Color> onColorChangedCallback;
+    private bool isSettingUp = false;
+
+    void Awake()
     {
-        // Ensure sliders are set to 0-1 in the Inspector!
+        rectTransform = GetComponent<RectTransform>();
         hueSlider.onValueChanged.AddListener(delegate { UpdateUI(); });
         satSlider.onValueChanged.AddListener(delegate { UpdateUI(); });
         valSlider.onValueChanged.AddListener(delegate { UpdateUI(); });
+    }
 
+    public void Initialize(Color initialColor, Action<Color> callback)
+    {
+        isSettingUp = true;
+        this.onColorChangedCallback = callback;
+
+        // Convert initial color to HSV to set slider positions
+        Color.RGBToHSV(initialColor, out float h, out float s, out float v);
+        hueSlider.value = h;
+        satSlider.value = s;
+        valSlider.value = v;
+
+        isSettingUp = false;
         UpdateUI();
+
+        PositionAtMouse();
+        gameObject.SetActive(true);
     }
 
     public void UpdateUI()
@@ -38,5 +60,49 @@ public class ColorPickerPanel : MonoBehaviour
 
         // Update Brightness Spectrum
         valOverlayImage.color = Color.HSVToRGB(h, s, 1);
+
+        if (!isSettingUp && onColorChangedCallback != null)
+        {
+            onColorChangedCallback.Invoke(finalColor);
+        }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        rectTransform.SetAsLastSibling();
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        rectTransform.anchoredPosition += eventData.delta;
+    }
+
+    private void PositionAtMouse()
+    {
+        if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
+
+        Vector2 mousePos = Input.mousePosition;
+        RectTransform parentRect = transform.parent as RectTransform;
+        
+        if (parentRect != null)
+        {
+            // Converts the screen mouse position to a point relative to the UI Canvas
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parentRect,
+                mousePos,
+                null, // Use your UI Camera here if using World Space/Camera Overlay
+                out Vector2 localPoint
+            );
+
+            // Add an offset so the panel doesn't spawn directly under the cursor 
+            Vector2 offset = new Vector2(0, -200);
+            rectTransform.anchoredPosition = localPoint + offset;
+        }
+    }
+
+    public void Close()
+    {
+        onColorChangedCallback = null;
+        gameObject.SetActive(false);
     }
 }
