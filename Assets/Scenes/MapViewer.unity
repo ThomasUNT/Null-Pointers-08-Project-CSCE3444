@@ -847,8 +847,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 182.5, y: -37}
-  m_SizeDelta: {x: 365, y: 85}
+  m_AnchoredPosition: {x: 100, y: -42.5}
+  m_SizeDelta: {x: 200, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &295285211
 MonoBehaviour:
@@ -1832,6 +1832,64 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1239721676}
   m_CullTransparentMesh: 1
+--- !u!1 &1439972179
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1439972181}
+  - component: {fileID: 1439972180}
+  m_Layer: 0
+  m_Name: MapDataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1439972180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439972179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d636a2b30a3c741b6eb292bf716a6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapDataManager
+  mapData:
+    nodes: []
+    mapTexts: []
+  mapRect: {fileID: 1542137272}
+  nodeIconPrefab: {fileID: 2296013802742988286, guid: f691fcf08bef4374e929675051b68cc2, type: 3}
+  mapTextPrefab: {fileID: 1569003058668544401, guid: 62b7a4fa7f0d931469011fb8acdeec72, type: 3}
+  editorUI: {fileID: 0}
+  defaultNodeSizeMultiplier: 2
+  ruinsSprite: {fileID: 2508076209106177942, guid: 8279b970d10204548b2c83cd2eaf7b60, type: 3}
+  villageSprite: {fileID: 3461850574408800985, guid: a6a0cf501d7c6fb4fbbb786f490fc1b8, type: 3}
+  townSprite: {fileID: -6470653568274419442, guid: 892819d8b0a73af45874333caec56e9b, type: 3}
+  citySprite: {fileID: 7961463184084027955, guid: b433ba0c30069ff42a46e176a11614a5, type: 3}
+  majorCitySprite: {fileID: 784445518160936739, guid: f415eda48cdc8b243a03c42709ae5eac, type: 3}
+  defaultSprite: {fileID: -3384411708189302445, guid: f00e6d63b2909b340aa3b07f92124efa, type: 3}
+--- !u!4 &1439972181
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439972179}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 541.1729, y: 256.34747, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1471246309
 GameObject:
   m_ObjectHideFlags: 0
@@ -2249,6 +2307,64 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1621067064}
   m_CullTransparentMesh: 1
+--- !u!1 &1672813283
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1672813285}
+  - component: {fileID: 1672813284}
+  m_Layer: 0
+  m_Name: MapDataManagerFull
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1672813284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672813283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d636a2b30a3c741b6eb292bf716a6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapDataManager
+  mapData:
+    nodes: []
+    mapTexts: []
+  mapRect: {fileID: 1068630413}
+  nodeIconPrefab: {fileID: 2296013802742988286, guid: f691fcf08bef4374e929675051b68cc2, type: 3}
+  mapTextPrefab: {fileID: 1569003058668544401, guid: 62b7a4fa7f0d931469011fb8acdeec72, type: 3}
+  editorUI: {fileID: 0}
+  defaultNodeSizeMultiplier: 2
+  ruinsSprite: {fileID: 2508076209106177942, guid: 8279b970d10204548b2c83cd2eaf7b60, type: 3}
+  villageSprite: {fileID: 3461850574408800985, guid: a6a0cf501d7c6fb4fbbb786f490fc1b8, type: 3}
+  townSprite: {fileID: -6470653568274419442, guid: 892819d8b0a73af45874333caec56e9b, type: 3}
+  citySprite: {fileID: 7961463184084027955, guid: b433ba0c30069ff42a46e176a11614a5, type: 3}
+  majorCitySprite: {fileID: 784445518160936739, guid: f415eda48cdc8b243a03c42709ae5eac, type: 3}
+  defaultSprite: {fileID: -3384411708189302445, guid: f00e6d63b2909b340aa3b07f92124efa, type: 3}
+--- !u!4 &1672813285
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672813283}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 541.1729, y: 256.34747, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1735941065
 GameObject:
   m_ObjectHideFlags: 0
@@ -2778,3 +2894,5 @@ SceneRoots:
   - {fileID: 173380562}
   - {fileID: 1471246311}
   - {fileID: 1997156237}
+  - {fileID: 1439972181}
+  - {fileID: 1672813285}
