@@ -375,7 +375,7 @@ public class NodeEditorUI : MonoBehaviour
 
         string titleId = activeNode.titleTextId;
 
-        CancelNodeEditor(); // Ensure any unsaved node changes are discarded before opening title editor
+        SaveNodeText();
 
         // if node has no title text assigned, we can't open the editor
         if (string.IsNullOrEmpty(titleId))
