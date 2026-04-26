@@ -27,7 +27,7 @@ public class NodeIcon : MonoBehaviour, IPointerDownHandler
     {
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
-            mapClickHandler.BeginNodeDrag(nodeData, eventData.position);
+            mapClickHandler.BeginNodeDrag(nodeData.id, eventData.position);
         }
     }
 }
