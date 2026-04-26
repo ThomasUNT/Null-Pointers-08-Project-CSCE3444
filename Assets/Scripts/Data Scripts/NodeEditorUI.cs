@@ -46,31 +46,43 @@ public class NodeEditorUI : MonoBehaviour
     private MapTextData activeText = null;
 
     private bool isInitializing = false; // Flag to prevent live update triggers during setup
+    public bool viewOnlyMode = false; // If true, all editing features disabled
 
 
     void Start()
     {
-        // Node Listeners
-        titleInputField.onValueChanged.AddListener(delegate { LiveUpdateNodeTitle(); });
-        nodeSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
-        typeDropdown.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
-        priorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
+        if (!viewOnlyMode)
+        {
+            // Node Listeners
+            titleInputField.onValueChanged.AddListener(delegate { LiveUpdateNodeTitle(); });
+            nodeSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
+            typeDropdown.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
+            priorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
 
-        // Title Editor Listeners
-        titleEditorInputField.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
-        titleFontSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
-        titleArcSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
-        titleRotationSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
-        titleXOffsetSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
-        titleYOffsetSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
-        titlePriorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+            // Title Editor Listeners
+            titleEditorInputField.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+            titleFontSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+            titleArcSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+            titleRotationSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+            titleXOffsetSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+            titleYOffsetSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+            titlePriorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
 
-        // Map Text Listeners
-        mapTextInputField.onValueChanged.AddListener(delegate { LiveUpdateText(); });
-        textFontSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
-        textArcSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
-        textRotationSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
-        textPriorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+            // Map Text Listeners
+            mapTextInputField.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+            textFontSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+            textArcSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+            textRotationSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+            textPriorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            HandleEscapePress();
+        }
     }
 
     // ------------------------------ Live Update Helpers ---------------------------------
@@ -175,12 +187,21 @@ public class NodeEditorUI : MonoBehaviour
 
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
-        titleEditorPanel.SetActive(false);
-        mapTextEditorPanel.SetActive(false);
 
-        // populate fields with data from json
-        priorityDropdown.value = activeNode.priority;
-        nodeSizeSlider.value = activeNode.size;
+        if (!viewOnlyMode)
+        {
+            titleEditorPanel.SetActive(false);
+            mapTextEditorPanel.SetActive(false);
+
+            // populate fields with data from json
+            priorityDropdown.value = activeNode.priority;
+            nodeSizeSlider.value = activeNode.size;
+
+            int typeIndex = typeDropdown.options.FindIndex(
+            option => option.text == activeNode.type);
+
+            typeDropdown.value = typeIndex >= 0 ? typeIndex : 0;
+        }
 
         if (!string.IsNullOrEmpty(activeNode.defaultNoteId))
         {
@@ -192,11 +213,6 @@ public class NodeEditorUI : MonoBehaviour
         }
 
         notesManager.LoadNotesByList(activeNode.noteIds);
-
-        int typeIndex = typeDropdown.options.FindIndex(
-            option => option.text == activeNode.type);
-
-        typeDropdown.value = typeIndex >= 0 ? typeIndex : 0;
 
         if (!string.IsNullOrEmpty(activeNode.titleTextId))
         {
@@ -400,6 +416,13 @@ public class NodeEditorUI : MonoBehaviour
 
     public void OpenTitleEditor(MapTextData text)
     {
+        if (viewOnlyMode)
+        {
+            // If view only, just open the node instead
+            OpenEditor(dataManager.mapData.nodes.Find(n => n.titleTextId == text.id));
+            return;
+        }
+
         if (activeNode != null || activeText != null)
         {
             dataManager.Load();
@@ -462,9 +485,13 @@ public class NodeEditorUI : MonoBehaviour
 
     public void CloseTitleEditor()
     {
-        titleEditorPanel.SetActive(false);
+        if (!viewOnlyMode)
+        {
+            titleEditorPanel.SetActive(false);
+            colorPicker.Close();
+        }
+
         buttonPanel.SetActive(true);
-        colorPicker.Close();
         activeText = null;
     }
 
@@ -478,6 +505,11 @@ public class NodeEditorUI : MonoBehaviour
 
     public void OpenTextEditor(MapTextData text)
     {
+        if (viewOnlyMode)
+        {
+            return;
+        }
+
         if (activeNode != null || activeText != null)
         {
             dataManager.Load();
@@ -522,9 +554,13 @@ public class NodeEditorUI : MonoBehaviour
 
     public void CloseTextEditor()
     {
-        mapTextEditorPanel.SetActive(false);
+        if (!viewOnlyMode)
+        {
+            mapTextEditorPanel.SetActive(false);
+            colorPicker.Close();
+        }
+
         buttonPanel.SetActive(true);
-        colorPicker.Close();
         activeText = null;
     }
 
@@ -556,5 +592,29 @@ public class NodeEditorUI : MonoBehaviour
         CloseTitleEditor();
 
         activeText = null;
+    }
+
+    private void HandleEscapePress()
+    {
+        if (activeText != null)
+        {
+            if (!viewOnlyMode)
+            {
+                CancelMapTextEditor();
+                CancelTitleEditor();
+            }
+            return;
+        }
+        if (activeNode != null)
+        {
+            if (viewOnlyMode)
+            {
+                CloseEditor();
+            }
+            else
+            {
+                CancelNodeEditor();
+            }
+        }
     }
 }
