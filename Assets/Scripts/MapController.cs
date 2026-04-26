@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class MapController : MonoBehaviour
 {
@@ -11,8 +13,8 @@ public class MapController : MonoBehaviour
     public MapDataManager mapDataManager;
 
     private RectTransform mapRT;
-
     private Vector2 lastMousePos;
+    private bool isPanning = false;
 
     void Awake()
     {
@@ -29,8 +31,33 @@ public class MapController : MonoBehaviour
             return; // mouse not over map
         }
 
+        if (!isPanning && IsMouseOverBlockingUI())
+        {
+            return;
+        }
+
         HandleZoom();
         HandlePan();
+    }
+
+    //Checks if there is UI between the mouse and the map
+    private bool IsMouseOverBlockingUI()
+    {
+        if (EventSystem.current == null) return false;
+
+        // Create a PointerEventData with the current mouse position
+        PointerEventData eventData = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
+        List<RaycastResult> results = new List<RaycastResult>();
+
+        // Raycast against all UI elements
+        EventSystem.current.RaycastAll(eventData, results);
+
+        if (results.Count > 0)
+        {
+            // If the topmost object is NOT the mapRect or a child of it, then we're over blocking UI
+            return !results[0].gameObject.transform.IsChildOf(mapRect);
+        }
+        return false;
     }
 
     void HandleZoom()
@@ -79,10 +106,11 @@ public class MapController : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
+                isPanning = true;
                 lastMousePos = Input.mousePosition; // On click, store the initial mouse position
             }
 
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0) && isPanning)
             {
                 Vector2 delta = (Vector2)Input.mousePosition - lastMousePos;
                 mapRT.anchoredPosition += delta;

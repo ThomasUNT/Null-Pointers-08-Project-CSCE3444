@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public class NodeData
@@ -66,6 +67,15 @@ public class MapTextData
         this.colorHex = "#FFFFFF";
         this.rotation = 0f;
         this.arc = 0f;
+    }
+
+    public Color GetColor()
+    {
+        if (ColorUtility.TryParseHtmlString(colorHex, out Color color))
+        {
+            return color;
+        }
+        return Color.white;
     }
 }
 

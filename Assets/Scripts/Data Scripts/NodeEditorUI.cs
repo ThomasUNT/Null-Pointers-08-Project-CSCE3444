@@ -40,16 +40,138 @@ public class NodeEditorUI : MonoBehaviour
 
     [SerializeField] private MapDataManager dataManager;
     [SerializeField] private NotesManager notesManager;
+    [SerializeField] private ColorPickerPanel colorPicker;
 
     private NodeData activeNode = null;
     private MapTextData activeText = null;
 
+    private bool isInitializing = false; // Flag to prevent live update triggers during setup
+
+
+    void Start()
+    {
+        // Node Listeners
+        titleInputField.onValueChanged.AddListener(delegate { LiveUpdateNodeTitle(); });
+        nodeSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
+        typeDropdown.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
+        priorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateNode(); });
+
+        // Title Editor Listeners
+        titleEditorInputField.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+        titleFontSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+        titleArcSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+        titleRotationSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+        titleXOffsetSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+        titleYOffsetSlider.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+        titlePriorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateTitle(); });
+
+        // Map Text Listeners
+        mapTextInputField.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+        textFontSizeSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+        textArcSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+        textRotationSlider.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+        textPriorityDropdown.onValueChanged.AddListener(delegate { LiveUpdateText(); });
+    }
+
+    // ------------------------------ Live Update Helpers ---------------------------------
+
+    private void LiveUpdateNode()
+    {
+        if (activeNode == null || isInitializing) return;
+        activeNode.size = nodeSizeSlider.value;
+        activeNode.type = typeDropdown.options[typeDropdown.value].text;
+        activeNode.priority = priorityDropdown.value;
+        dataManager.DrawNodes(); // Redraw immediately
+    }
+
+    private void LiveUpdateNodeTitle()
+    {
+        if (activeNode == null || isInitializing) return;
+
+        string newTitleText = titleInputField.text;
+
+        // CASE 1: Box is empty -> Remove the title if it exists
+        if (string.IsNullOrEmpty(newTitleText))
+        {
+            if (!string.IsNullOrEmpty(activeNode.titleTextId))
+            {
+                MapTextData existing = dataManager.mapData.mapTexts.Find(t => t.id == activeNode.titleTextId);
+                if (existing != null) dataManager.mapData.mapTexts.Remove(existing);
+
+                activeNode.titleTextId = "";
+            }
+        }
+        // CASE 2: Box has text -> Update or Create
+        else
+        {
+            if (!string.IsNullOrEmpty(activeNode.titleTextId))
+            {
+                // Update existing
+                MapTextData existing = dataManager.mapData.mapTexts.Find(t => t.id == activeNode.titleTextId);
+                if (existing != null)
+                {
+                    existing.content = newTitleText;
+                    // Keep it synced to node position
+                    existing.x = activeNode.x;
+                    existing.y = activeNode.y;
+                }
+            }
+            else
+            {
+                // Create new title
+                MapTextData newText = CreateDefaultTitleObject(newTitleText);
+                dataManager.mapData.mapTexts.Add(newText);
+                activeNode.titleTextId = newText.id;
+            }
+        }
+
+        // Redraw
+        dataManager.DrawMapTexts();
+    }
+
+    private void LiveUpdateTitle()
+    {
+        if (activeText == null || isInitializing) return;
+
+        activeText.content = titleEditorInputField.text;
+        activeText.fontSize = titleFontSizeSlider.value;
+        activeText.arc = titleArcSlider.value;
+        activeText.rotation = titleRotationSlider.value;
+        activeText.xOffset = titleXOffsetSlider.value;
+        activeText.yOffset = titleYOffsetSlider.value;
+        activeText.priority = titlePriorityDropdown.value;
+
+        dataManager.DrawMapTexts(); // Redraw immediately
+    }
+
+    private void LiveUpdateText()
+    {
+        if (activeText == null || isInitializing) return;
+
+        activeText.content = mapTextInputField.text;
+        activeText.fontSize = textFontSizeSlider.value;
+        activeText.arc = textArcSlider.value;
+        activeText.rotation = textRotationSlider.value;
+        activeText.priority = textPriorityDropdown.value;
+
+        dataManager.DrawMapTexts(); // Redraw immediately
+    }
 
     // ------------------------------ Node Editor Methods ---------------------------------
 
     public void OpenEditor(NodeData node)
     {
-        activeNode = node;
+        if (activeNode != null || activeText != null)
+        {
+            dataManager.Load();
+            dataManager.DrawNodes();
+            dataManager.DrawMapTexts();
+        }
+
+        activeNode = dataManager.mapData.nodes.Find(n => n.id == node.id);
+        if (activeNode == null) return;
+
+        isInitializing = true;
 
         nodeTextInputPanel.SetActive(true);
         buttonPanel.SetActive(false);
@@ -57,28 +179,28 @@ public class NodeEditorUI : MonoBehaviour
         mapTextEditorPanel.SetActive(false);
 
         // populate fields with data from json
-        priorityDropdown.value = node.priority;
-        nodeSizeSlider.value = node.size;
+        priorityDropdown.value = activeNode.priority;
+        nodeSizeSlider.value = activeNode.size;
 
-        if (!string.IsNullOrEmpty(node.defaultNoteId))
+        if (!string.IsNullOrEmpty(activeNode.defaultNoteId))
         {
-            notesManager.OpenNoteById(node.defaultNoteId);
+            notesManager.OpenNoteById(activeNode.defaultNoteId);
         }
         else
         {
             notesManager.ClearEditorUI();
         }
 
-            notesManager.LoadNotesByList(node.noteIds);
+        notesManager.LoadNotesByList(activeNode.noteIds);
 
         int typeIndex = typeDropdown.options.FindIndex(
-            option => option.text == node.type);
+            option => option.text == activeNode.type);
 
         typeDropdown.value = typeIndex >= 0 ? typeIndex : 0;
 
         if (!string.IsNullOrEmpty(activeNode.titleTextId))
         {
-            MapTextData titleData = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
+            MapTextData titleData = dataManager.mapData.mapTexts.Find(t => t.id == activeNode.titleTextId);
 
             if (titleData != null)
             {
@@ -93,6 +215,8 @@ public class NodeEditorUI : MonoBehaviour
         // focus cursor automatically
         inputField.ActivateInputField();
         inputField.Select();
+
+        isInitializing = false;
     }
 
     public void CreateNewNoteForActiveNode()
@@ -119,6 +243,27 @@ public class NodeEditorUI : MonoBehaviour
         notesManager.LoadNotesByList(activeNode.noteIds);
 
         Debug.Log($"Created new note {newNoteId} for node {activeNode.id}");
+    }
+
+    private MapTextData CreateDefaultTitleObject(string content)
+    {
+        Rect rect = dataManager.mapRect.rect;
+        float normalizedYOffset = 20f / rect.height;
+
+        return new MapTextData()
+        {
+            id = System.Guid.NewGuid().ToString(),
+            content = content,
+            x = activeNode.x,
+            y = activeNode.y,
+            yOffset = -normalizedYOffset,
+            xOffset = 0f,
+            fontSize = 14,
+            priority = 0,
+            colorHex = "#FFFFFF",
+            rotation = 0f,
+            arc = 0f
+        };
     }
 
     public void DeleteActiveNote()
@@ -174,71 +319,13 @@ public class NodeEditorUI : MonoBehaviour
     {
         if (activeNode == null) return;
 
-        NodeData node = activeNode;
+        // Final sync for non-title node data
+        activeNode.text = inputField.text;
+        activeNode.type = typeDropdown.options[typeDropdown.value].text;
+        activeNode.priority = priorityDropdown.value;
+        activeNode.size = nodeSizeSlider.value;
 
-        node.text = inputField.text;
-        node.type = typeDropdown.options[typeDropdown.value].text;
-        node.priority = priorityDropdown.value;
-        node.size = nodeSizeSlider.value;
-
-        string newTitleText = titleInputField.text;
-
-        // if title text is empty, remove existing title text entry if it exists
-        if (string.IsNullOrEmpty(newTitleText))
-        {
-            if (!string.IsNullOrEmpty(node.titleTextId))
-            {
-                MapTextData existing = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
-
-                if (existing != null) dataManager.mapData.mapTexts.Remove(existing);
-
-                node.titleTextId = "";
-            }
-        }
-        else
-        {
-            // normalize offset
-            Rect rect = dataManager.mapRect.rect;
-
-            float normalizedYOffset = 20f / rect.height;
-
-            // If node already has a title text entry, update it. Otherwise create a new one.
-            if (!string.IsNullOrEmpty(node.titleTextId))
-            {
-                MapTextData existing = dataManager.mapData.mapTexts.Find(t => t.id == node.titleTextId);
-                if (existing != null)
-                {
-                    existing.content = newTitleText;
-                    existing.x = node.x;
-                    existing.y = node.y;
-                }
-            }
-            else
-            {
-                // create new title text entry
-                MapTextData newText = new MapTextData();
-                newText.id = System.Guid.NewGuid().ToString();
-                newText.content = newTitleText;
-                newText.x = node.x;
-                newText.y = node.y;
-                newText.yOffset = -normalizedYOffset; //Store default offset
-                newText.xOffset = 0f;
-                newText.fontSize = 14;
-                newText.priority = 0;
-                newText.colorHex = "#FFFFFF";
-                newText.rotation = 0f;
-                newText.arc = 0f;
-
-                dataManager.mapData.mapTexts.Add(newText);
-
-                node.titleTextId = newText.id;
-            }
-        }
-
-        dataManager.Save();
-        dataManager.DrawNodes();
-        dataManager.DrawMapTexts();
-
+        dataManager.Save(); // Writes the current state (including new titles) to JSON
         CloseEditor();
     }
 
@@ -262,6 +349,15 @@ public class NodeEditorUI : MonoBehaviour
         CloseEditor();
     }
 
+    public void CancelNodeEditor()
+    {
+        // We discard changes by reloading the original JSON from disk
+        dataManager.Load();
+        dataManager.DrawNodes();
+        dataManager.DrawMapTexts();
+        CloseEditor();
+    }
+
     public void CloseEditor()
     {
         nodeTextInputPanel.SetActive(false);
@@ -277,10 +373,12 @@ public class NodeEditorUI : MonoBehaviour
     {
         if (activeNode == null) return;
 
-        NodeData node = activeNode;
+        string titleId = activeNode.titleTextId;
+
+        SaveNodeText();
 
         // if node has no title text assigned, we can't open the editor
-        if (string.IsNullOrEmpty(node.titleTextId))
+        if (string.IsNullOrEmpty(titleId))
         {
             Debug.LogWarning("Node has no title text assigned.");
             return;
@@ -288,7 +386,7 @@ public class NodeEditorUI : MonoBehaviour
 
         // text lookup by id
         MapTextData text = dataManager.mapData.mapTexts
-            .Find(t => t.id == node.titleTextId);
+            .Find(t => t.id == titleId);
 
         if (text == null)
         {
@@ -302,7 +400,17 @@ public class NodeEditorUI : MonoBehaviour
 
     public void OpenTitleEditor(MapTextData text)
     {
-        activeText = text;
+        if (activeNode != null || activeText != null)
+        {
+            dataManager.Load();
+            dataManager.DrawNodes();
+            dataManager.DrawMapTexts();
+        }
+
+        activeText = dataManager.mapData.mapTexts.Find(t => t.id == text.id);
+        if (activeText == null) return;
+
+        isInitializing = true;
 
         // Change Panels
         titleEditorPanel.SetActive(true);
@@ -310,45 +418,53 @@ public class NodeEditorUI : MonoBehaviour
         buttonPanel.SetActive(false);
 
         // Populate fields
-        titleEditorInputField.text = text.content;
-        titleFontSizeSlider.value = text.fontSize;
-        titleArcSlider.value = text.arc;
-        titleRotationSlider.value = text.rotation;
-        titleXOffsetSlider.value = text.xOffset;
-        titleYOffsetSlider.value = text.yOffset;
-        titlePriorityDropdown.value = text.priority;
+        titleEditorInputField.text = activeText.content;
+        titleFontSizeSlider.value = activeText.fontSize;
+        titleArcSlider.value = activeText.arc;
+        titleRotationSlider.value = activeText.rotation;
+        titleXOffsetSlider.value = activeText.xOffset;
+        titleYOffsetSlider.value = activeText.yOffset;
+        titlePriorityDropdown.value = activeText.priority;
+
+        isInitializing = false;
     }
 
+    public void OnPickMapTextColorClicked()
+    {
+        if (activeText == null) return;
+
+        if (colorPicker.gameObject.activeSelf)
+        {
+            colorPicker.Close();
+            return;
+        }
+
+        // Pass the current color and a set of instructions on what to do when it changes
+        colorPicker.Initialize(activeText.GetColor(), (newColor) => {
+            activeText.colorHex = "#" + ColorUtility.ToHtmlStringRGB(newColor);
+            dataManager.DrawMapTexts(); // Live preview
+        });
+    }
 
     public void saveTitleEditor()
     {
         if (activeText == null) return;
-
-        MapTextData text = activeText;
-
-        // save changes to text data
-        text.content = titleEditorInputField.text;
-        text.priority = titlePriorityDropdown.value;
-        text.fontSize = titleFontSizeSlider.value;
-        text.arc = titleArcSlider.value;
-        text.rotation = titleRotationSlider.value;
-        text.xOffset = titleXOffsetSlider.value;
-        text.yOffset = titleYOffsetSlider.value;
-
-        // Save data
-        dataManager.Save();
-
-        // Redraw map texts to reflect changes
-        dataManager.DrawMapTexts();
-
+        dataManager.Save(); // Save the live changes to disk
         CloseTitleEditor();
     }
 
+    public void CancelTitleEditor()
+    {
+        dataManager.Load(); // Revert to version from json
+        dataManager.DrawMapTexts();
+        CloseTitleEditor();
+    }
 
     public void CloseTitleEditor()
     {
         titleEditorPanel.SetActive(false);
         buttonPanel.SetActive(true);
+        colorPicker.Close();
         activeText = null;
     }
 
@@ -362,7 +478,17 @@ public class NodeEditorUI : MonoBehaviour
 
     public void OpenTextEditor(MapTextData text)
     {
-        activeText = text;
+        if (activeNode != null || activeText != null)
+        {
+            dataManager.Load();
+            dataManager.DrawNodes();
+            dataManager.DrawMapTexts();
+        }
+
+        activeText = dataManager.mapData.mapTexts.Find(t => t.id == text.id);
+        if (activeText == null) return;
+
+        isInitializing = true;
 
         // Change Panels
         mapTextEditorPanel.SetActive(true);
@@ -371,33 +497,26 @@ public class NodeEditorUI : MonoBehaviour
         titleEditorPanel.SetActive(false);
 
         // Populate fields
-        mapTextInputField.text = text.content;
-        textFontSizeSlider.value = text.fontSize;
-        textArcSlider.value = text.arc;
-        textRotationSlider.value = text.rotation;
-        textPriorityDropdown.value = text.priority;
+        mapTextInputField.text = activeText.content;
+        textFontSizeSlider.value = activeText.fontSize;
+        textArcSlider.value = activeText.arc;
+        textRotationSlider.value = activeText.rotation;
+        textPriorityDropdown.value = activeText.priority;
+
+        isInitializing = false;
     }
 
     public void saveTextEditor()
     {
         if (activeText == null) return;
+        dataManager.Save(); // Save the live changes to disk
+        CloseTextEditor();
+    }
 
-        MapTextData text = activeText;
-
-        // save changes to text data
-        text.content = mapTextInputField.text;
-        text.priority = textPriorityDropdown.value;
-        text.fontSize = textFontSizeSlider.value;
-        text.arc = textArcSlider.value;
-        text.rotation = textRotationSlider.value;
-
-
-        // Save data
-        dataManager.Save();
-
-        // Redraw map texts to reflect changes
+    public void CancelMapTextEditor()
+    {
+        dataManager.Load(); // Revert to last saved version from json
         dataManager.DrawMapTexts();
-
         CloseTextEditor();
     }
 
@@ -405,6 +524,7 @@ public class NodeEditorUI : MonoBehaviour
     {
         mapTextEditorPanel.SetActive(false);
         buttonPanel.SetActive(true);
+        colorPicker.Close();
         activeText = null;
     }
 
@@ -437,5 +557,4 @@ public class NodeEditorUI : MonoBehaviour
 
         activeText = null;
     }
-
 }

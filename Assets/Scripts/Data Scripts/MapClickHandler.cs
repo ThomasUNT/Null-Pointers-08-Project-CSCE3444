@@ -12,8 +12,8 @@ public class MapClickHandler : MonoBehaviour
     // Move Stuff
     public bool isDragging = false;
 
-    private NodeData draggingNode;
-    private MapTextData draggingText;
+    private string draggingNodeId;
+    private string draggingTextId;
 
     private Vector2 dragStartMousePos;
     private Vector2 dragStartObjectPos;
@@ -103,36 +103,39 @@ public class MapClickHandler : MonoBehaviour
     // ------------- Drag Nodes and Texts -------------------
 
 
-    public void BeginNodeDrag(NodeData node, Vector2 screenPosition)
+    public void BeginNodeDrag(string nodeId, Vector2 screenPosition)
     {
         if (!TryGetLocalPoint(screenPosition, out Vector2 localPoint))
             return;
 
-        isDragging = true;
-        draggingNode = node;
-        draggingText = null;
 
-        dragStartMousePos = localPoint;
-        dragStartObjectPos = new Vector2(node.x, node.y);
+        NodeData node = dataManager.mapData.nodes.Find(n => n.id == nodeId);
+        if (node != null)
+        {
+            isDragging = true;
+            draggingNodeId = nodeId;
+            draggingTextId = null;
+
+            dragStartMousePos = localPoint;
+            dragStartObjectPos = new Vector2(node.x, node.y);
+        }
     }
 
-    public void BeginTextDrag(MapTextData mapText, Vector2 screenPosition)
+    public void BeginTextDrag(string mapTextId, Vector2 screenPosition)
     {
-        if (mapText == null)
-        {
-            Debug.LogError("BeginTextDrag received NULL mapText!");
-            return;
-        }
-
         if (!TryGetLocalPoint(screenPosition, out Vector2 localPoint))
             return;
 
-        isDragging = true;
-        draggingText = mapText;
-        draggingNode = null;
+        MapTextData text = dataManager.mapData.mapTexts.Find(t => t.id == mapTextId);
+        if (text != null)
+        {
+            isDragging = true;
+            draggingTextId = mapTextId;
+            draggingNodeId = null;
 
-        dragStartMousePos = localPoint;
-        dragStartObjectPos = new Vector2(mapText.x, mapText.y);
+            dragStartMousePos = localPoint;
+            dragStartObjectPos = new Vector2(text.x, text.y);
+        }
     }
 
     private void HandleDragging()
@@ -147,64 +150,69 @@ public class MapClickHandler : MonoBehaviour
         Vector2 delta = (localPoint - dragStartMousePos) / mapRect.rect.size;
 
         // Move node and attached title text if exists
-        if (draggingNode != null)
+        if (!string.IsNullOrEmpty(draggingNodeId))
         {
-            NodeData node = draggingNode;
-
-            float newX = Mathf.Clamp(dragStartObjectPos.x + delta.x, 0f, 1f);
-            float newY = Mathf.Clamp(dragStartObjectPos.y + delta.y, 0f, 1f);
-
-            // Calculate how much the node actually moved
-            float deltaX = newX - node.x;
-            float deltaY = newY - node.y;
-
-            node.x = newX;
-            node.y = newY;
-
-            // Move attached title text if it exists
-            if (!string.IsNullOrEmpty(node.titleTextId))
-            {
-                MapTextData titleText = dataManager.mapData.mapTexts
-                    .Find(t => t.id == node.titleTextId);
-
-                if (titleText != null)
-                {
-                    titleText.x += deltaX;
-                    titleText.y += deltaY;
-                }
-            }
-
-            dataManager.DrawNodes();
-            dataManager.DrawMapTexts();
-        }
-
-        // Move text (and node if this text is a title)
-        if (draggingText != null)
-        {
-            MapTextData text = draggingText;
-
-            float newX = Mathf.Clamp(dragStartObjectPos.x + delta.x, 0f, 1f);
-            float newY = Mathf.Clamp(dragStartObjectPos.y + delta.y, 0f, 1f);
-
-            // Calculate actual movement delta
-            float deltaX = newX - text.x;
-            float deltaY = newY - text.y;
-
-            text.x = newX;
-            text.y = newY;
-
-            // Check if this text is a node title
-            NodeData node = dataManager.mapData.nodes
-                .Find(n => n.titleTextId == text.id);
+            NodeData node = dataManager.mapData.nodes.Find(n => n.id == draggingNodeId);
 
             if (node != null)
             {
-                node.x += deltaX;
-                node.y += deltaY;
-            }
+                float newX = Mathf.Clamp(dragStartObjectPos.x + delta.x, 0f, 1f);
+                float newY = Mathf.Clamp(dragStartObjectPos.y + delta.y, 0f, 1f);
 
-            dataManager.DrawNodes();
-            dataManager.DrawMapTexts();
+                // Calculate how much the node actually moved
+                float deltaX = newX - node.x;
+                float deltaY = newY - node.y;
+
+                node.x = newX;
+                node.y = newY;
+
+                // Move attached title text if it exists
+                if (!string.IsNullOrEmpty(node.titleTextId))
+                {
+                    MapTextData titleText = dataManager.mapData.mapTexts
+                        .Find(t => t.id == node.titleTextId);
+
+                    if (titleText != null)
+                    {
+                        titleText.x += deltaX;
+                        titleText.y += deltaY;
+                    }
+                }
+
+                dataManager.DrawNodes();
+                dataManager.DrawMapTexts();
+            }
+        }
+
+        // Move text (and node if this text is a title)
+        if (!string.IsNullOrEmpty(draggingTextId))
+        {
+            MapTextData text = dataManager.mapData.mapTexts.Find(t => t.id == draggingTextId);
+
+            if (text != null)
+            {
+                float newX = Mathf.Clamp(dragStartObjectPos.x + delta.x, 0f, 1f);
+                float newY = Mathf.Clamp(dragStartObjectPos.y + delta.y, 0f, 1f);
+
+                // Calculate actual movement delta
+                float deltaX = newX - text.x;
+                float deltaY = newY - text.y;
+
+                text.x = newX;
+                text.y = newY;
+
+                // Check if this text is a node title
+                NodeData ownerNode = dataManager.mapData.nodes.Find(n => n.titleTextId == text.id);
+
+                if (ownerNode != null)
+                {
+                    ownerNode.x += deltaX;
+                    ownerNode.y += deltaY;
+                }
+
+                dataManager.DrawNodes();
+                dataManager.DrawMapTexts();
+            }
         }
 
         // Stop dragging when mouse released
@@ -212,10 +220,27 @@ public class MapClickHandler : MonoBehaviour
         {
             isDragging = false;
 
-            draggingNode = null;
-            draggingText = null;
+            string finalNodeId = draggingNodeId;
+            string finalTextId = draggingTextId;
 
-            dataManager.Save();
+            // Identify which IDs were involved in this move
+            if (!string.IsNullOrEmpty(draggingNodeId))
+            {
+                NodeData node = dataManager.mapData.nodes.Find(n => n.id == draggingNodeId);
+                if (node != null) finalTextId = node.titleTextId;
+            }
+
+            else if (!string.IsNullOrEmpty(draggingTextId))
+            {
+                NodeData node = dataManager.mapData.nodes.Find(n => n.titleTextId == draggingTextId);
+                if (node != null) finalNodeId = node.id;
+            }
+
+            // Save only the position updates
+            dataManager.SavePositionsOnly(finalNodeId, finalTextId);
+
+            draggingNodeId = null;
+            draggingTextId = null;
         }
     }
 }

@@ -46,7 +46,7 @@ public class MapTextIcon : MonoBehaviour, IPointerDownHandler
     {
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
-            mapClickHandler.BeginTextDrag(mapTextData, eventData.position);
+            mapClickHandler.BeginTextDrag(mapTextData.id, eventData.position);
         }
     }
 }
