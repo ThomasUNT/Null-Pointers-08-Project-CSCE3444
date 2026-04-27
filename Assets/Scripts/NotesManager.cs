@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -326,10 +327,14 @@ public class NotesManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
 
-        string desiredName = titleEditor.text;
+        string desiredName = SanitizeFileName(titleEditor.text);
 
         // If the name hasn't actually changed, don't do anything
-        if (Path.GetFileNameWithoutExtension(currentNotePath) == desiredName) return;
+        if (Path.GetFileNameWithoutExtension(currentNotePath) == desiredName)
+        {
+            titleEditor.text = desiredName; // Ensure sanitized name is reflected in UI
+            return;
+        }
 
         string finalName;
         string newPath = GetUniquePath(folderPath, desiredName, out finalName);
@@ -349,12 +354,14 @@ public class NotesManager : MonoBehaviour
         string oldPath = NoteRegistry.GetPath(id);
         if (string.IsNullOrEmpty(oldPath) || !File.Exists(oldPath)) return newName;
 
+        string cleanedName = SanitizeFileName(newName);
+
         // If the name hasn't changed, just return
-        if (Path.GetFileNameWithoutExtension(oldPath) == newName) return newName;
+        if (Path.GetFileNameWithoutExtension(oldPath) == cleanedName) return cleanedName;
 
         string folder = Path.GetDirectoryName(oldPath);
         string finalName;
-        string newPath = GetUniquePath(folder, newName, out finalName);
+        string newPath = GetUniquePath(folder, cleanedName, out finalName);
 
         File.Move(oldPath, newPath);
         NoteRegistry.UpdateEntry(id, newPath);
@@ -366,6 +373,19 @@ public class NotesManager : MonoBehaviour
         }
 
         return finalName; // Return the name (possibly with digit appended)
+    }
+
+    private string SanitizeFileName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "Unnamed Note";
+
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+        string cleanName = new string(name.Where(mbox => !invalidChars.Contains(mbox)).ToArray());
+
+        // Trim whitespace and newlines
+        cleanName = cleanName.Trim();
+
+        return string.IsNullOrEmpty(cleanName) ? "Unnamed Note" : cleanName;
     }
 
     public void DeleteNote()
