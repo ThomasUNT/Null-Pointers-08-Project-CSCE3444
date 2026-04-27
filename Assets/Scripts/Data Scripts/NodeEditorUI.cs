@@ -179,6 +179,7 @@ public class NodeEditorUI : MonoBehaviour
             dataManager.Load();
             dataManager.DrawNodes();
             dataManager.DrawMapTexts();
+            activeText = null;
         }
 
         activeNode = dataManager.mapData.nodes.Find(n => n.id == node.id);
