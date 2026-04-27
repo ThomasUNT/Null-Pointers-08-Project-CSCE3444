@@ -485,12 +485,8 @@ public class NodeEditorUI : MonoBehaviour
 
     public void CloseTitleEditor()
     {
-        if (!viewOnlyMode)
-        {
-            titleEditorPanel.SetActive(false);
-            colorPicker.Close();
-        }
-
+        titleEditorPanel.SetActive(false);
+        colorPicker.Close();
         buttonPanel.SetActive(true);
         activeText = null;
     }
@@ -505,11 +501,6 @@ public class NodeEditorUI : MonoBehaviour
 
     public void OpenTextEditor(MapTextData text)
     {
-        if (viewOnlyMode)
-        {
-            return;
-        }
-
         if (activeNode != null || activeText != null)
         {
             dataManager.Load();

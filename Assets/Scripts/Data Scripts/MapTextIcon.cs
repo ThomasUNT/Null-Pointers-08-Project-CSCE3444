@@ -37,6 +37,7 @@ public class MapTextIcon : MonoBehaviour, IPointerDownHandler
         }
         else
         {
+            if (editorUI.viewOnlyMode) return;
             editorUI.CloseTitleEditor();
             editorUI.OpenTextEditor(mapTextData);
         }
