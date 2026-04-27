@@ -121,7 +121,7 @@ public class MapController : MonoBehaviour
         }
     }
 
-    void ClampToWindow()
+    public void ClampToWindow()
     {
         Vector2 mapSize = mapRT.sizeDelta * mapRT.localScale * 0.5f;
         Vector2 windowSize = mapWindow.rect.size * 0.5f;

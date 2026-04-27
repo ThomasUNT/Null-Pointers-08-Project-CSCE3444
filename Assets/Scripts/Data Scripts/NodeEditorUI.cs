@@ -42,6 +42,7 @@ public class NodeEditorUI : MonoBehaviour
     [SerializeField] private MapDataManager dataManager;
     [SerializeField] private NotesManager notesManager;
     [SerializeField] private ColorPickerPanel colorPicker;
+    [SerializeField] private MapFullscreenHandler fullScreenHandler;
 
     private NodeData activeNode = null;
     private MapTextData activeText = null;
@@ -174,6 +175,11 @@ public class NodeEditorUI : MonoBehaviour
 
     public void OpenEditor(NodeData node)
     {
+        if (fullScreenHandler != null && fullScreenHandler.isFullscreen)
+        {
+            fullScreenHandler.ToggleFullscreen();
+        }
+
         if (activeNode != null || activeText != null)
         {
             dataManager.Load();
@@ -231,8 +237,8 @@ public class NodeEditorUI : MonoBehaviour
         }
 
         // focus cursor automatically
-        inputField.ActivateInputField();
-        inputField.Select();
+/*        inputField.ActivateInputField();
+        inputField.Select();*/
 
         isInitializing = false;
     }
