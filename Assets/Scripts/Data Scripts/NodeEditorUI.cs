@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using UnityEngine.UIElements;
 
@@ -245,6 +246,11 @@ public class NodeEditorUI : MonoBehaviour
 
         // Tell NotesManager to create the physical file.
         string newNoteId = notesManager.CreateNote(activeNode.id);
+
+        if (string.IsNullOrEmpty(activeNode.defaultNoteId))
+        {
+            activeNode.defaultNoteId = newNoteId;
+        }
 
         // Add this ID to the node's list of associated notes.
         if (!activeNode.noteIds.Contains(newNoteId))
