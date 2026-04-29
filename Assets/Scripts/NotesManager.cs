@@ -1,9 +1,10 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using TMPro;
+using Unity.Loading;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class NotesManager : MonoBehaviour
 {
@@ -35,6 +36,8 @@ public class NotesManager : MonoBehaviour
 
     public void IncrementalIncrease() => AdjustSelectionSize(sizeStep);
     public void IncrementalDecrease() => AdjustSelectionSize(-sizeStep);
+
+    private string selectedFolderPath;
 
     private void AdjustSelectionSize(float amount)
     {
@@ -79,7 +82,8 @@ public class NotesManager : MonoBehaviour
 
         if (titleEditor != null)
         {
-            titleEditor.onEndEdit.AddListener(delegate { RenameNote(); });
+            titleEditor.onEndEdit.RemoveAllListeners();
+            titleEditor.onEndEdit.AddListener(delegate { OnTitleEndEdit(); });
         }
 
         SetMap(PlayerPrefs.GetString("LastMapFolder", ""));
@@ -172,10 +176,72 @@ public class NotesManager : MonoBehaviour
             dataManager.ValidateNodeNotes();
         }
 
-        if (notesListContent != null) LoadNotes();
+        if (notesListContent != null) LoadHierarchicalNotes();
     }
 
-    public void LoadNotes()
+    private void GenerateTreeUI(string currentPath, Transform parentUI, int indentLevel)
+    {
+        // 1. Handle Subdirectories (Folders) first
+        string[] subDirs = Directory.GetDirectories(currentPath);
+        foreach (string dir in subDirs)
+        {
+            GameObject folderObj = Instantiate(noteButtonPrefab, parentUI);
+            folderObj.GetComponentInChildren<TMP_Text>().text = new string(' ', indentLevel * 4) + Path.GetFileName(dir);
+
+            UnityEngine.UI.Image folderImage = folderObj.GetComponent<UnityEngine.UI.Image>();
+            if (folderImage != null)
+            {
+                folderImage.color = new Color(1f, 0.98f, 0.85f); //Folder color
+            }
+
+
+            // This container is where the folder's internal notes will live
+            GameObject childContainer = new GameObject("ChildContainer", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            childContainer.transform.SetParent(parentUI, false);
+
+            var vlg = childContainer.GetComponent<VerticalLayoutGroup>();
+            vlg.childControlHeight = true;
+            vlg.childControlWidth = true;
+            vlg.childForceExpandHeight = false;
+            vlg.childForceExpandWidth = true;
+
+            var csf = childContainer.GetComponent<ContentSizeFitter>();
+            csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained; // Don't let it shrink width
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+
+            childContainer.transform.SetAsLastSibling();
+
+            Button btn = folderObj.GetComponent<Button>();
+            btn.onClick.AddListener(() => {
+                childContainer.SetActive(!childContainer.activeSelf);
+                selectedFolderPath = dir;
+                currentNotePath = "";
+                if (titleEditor != null) titleEditor.text = Path.GetFileName(dir);
+            });
+
+            // RECURSION: This is the key. By passing childContainer.transform, 
+            // the NEXT call to this function will put its notes inside THIS folder.
+            GenerateTreeUI(dir, childContainer.transform, indentLevel + 1);
+        }
+
+        // 2. Handle Files (Notes)
+        string[] files = Directory.GetFiles(currentPath, "*.md");
+        foreach (string file in files)
+        {
+            // Use parentUI here. If we are inside a subfolder, parentUI IS the childContainer.
+            GameObject btn = Instantiate(noteButtonPrefab, parentUI);
+            string fileName = Path.GetFileNameWithoutExtension(file);
+
+            var text = btn.GetComponentInChildren<TMP_Text>();
+            text.text = new string(' ', indentLevel * 4) + fileName;
+
+            string path = file;
+            btn.GetComponent<Button>().onClick.AddListener(() => OpenNote(path));
+        }
+    }
+
+    public void LoadHierarchicalNotes()
     {
         if (notesListContent == null) return;
 
@@ -184,17 +250,7 @@ public class NotesManager : MonoBehaviour
 
         if (!Directory.Exists(folderPath)) return;
 
-        string[] files = Directory.GetFiles(folderPath, "*.md");
-
-        foreach (string file in files)
-        {
-            GameObject btn = Instantiate(noteButtonPrefab, notesListContent);
-            string fileName = Path.GetFileNameWithoutExtension(file);
-            btn.GetComponentInChildren<TMP_Text>().text = fileName;
-
-            string path = file;
-            btn.GetComponent<Button>().onClick.AddListener(() => OpenNote(path));
-        }
+        GenerateTreeUI(folderPath, notesListContent, 0);
     }
 
     public void LoadNotesByList(List<string> noteIds)
@@ -234,8 +290,10 @@ public class NotesManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(folderPath)) InitializeNotes();
 
+        string targetDir = string.IsNullOrEmpty(selectedFolderPath) ? folderPath : selectedFolderPath;
+
         string finalName;
-        string fullPath = GetUniquePath(folderPath, "note", out finalName);
+        string fullPath = GetUniquePath(targetDir, "note", out finalName);
 
         string id = System.Guid.NewGuid().ToString();
         string content = BuildFrontmatter(id, nodeId);
@@ -247,10 +305,27 @@ public class NotesManager : MonoBehaviour
         currentNoteId = id;
         currentNodeId = nodeId;
 
-        LoadNotes();
+        LoadHierarchicalNotes();
         OpenNote(fullPath);
         return id;
     }
+
+    public void CreateFolder(string folderName = "New Folder")
+    {
+        string newFolderPath = Path.Combine(folderPath, folderName);
+
+        //Ensure unique folder name if it exists
+        int counter = 1;
+        while (Directory.Exists(newFolderPath))
+        {
+            newFolderPath = Path.Combine(folderPath, $"{folderName} {counter}");
+            counter++;
+        }
+
+        Directory.CreateDirectory(newFolderPath);
+        LoadHierarchicalNotes();
+    }
+
 
     private string GetUniquePath(string folder, string baseName, out string finalName)
     {
@@ -332,7 +407,8 @@ public class NotesManager : MonoBehaviour
         if (Path.GetFileNameWithoutExtension(currentNotePath) == desiredName) return;
 
         string finalName;
-        string newPath = GetUniquePath(folderPath, desiredName, out finalName);
+        string currentDirectory = Path.GetDirectoryName(currentNotePath);
+        string newPath = GetUniquePath(currentDirectory, desiredName, out finalName);
 
         File.Move(currentNotePath, newPath);
         currentNotePath = newPath;
@@ -341,7 +417,7 @@ public class NotesManager : MonoBehaviour
         titleEditor.text = finalName;
 
         NoteRegistry.UpdateEntry(currentNoteId, newPath);
-        LoadNotes();
+        LoadHierarchicalNotes();
     }
 
     public string RenameNoteById(string id, string newName)
@@ -368,16 +444,100 @@ public class NotesManager : MonoBehaviour
         return finalName; // Return the name (possibly with digit appended)
     }
 
+    public void OnTitleEndEdit()
+    {
+        // If a note is open, use your existing note rename logic
+        if (!string.IsNullOrEmpty(currentNotePath))
+        {
+            RenameNote();
+        }
+        // If no note is open but a folder is selected, use the folder rename logic
+        else if (!string.IsNullOrEmpty(selectedFolderPath) && selectedFolderPath != folderPath)
+        {
+            RenameFolder();
+        }
+    }
+
+    public void RenameFolder()
+    {
+        if (string.IsNullOrEmpty(selectedFolderPath)) return;
+
+        string desiredName = titleEditor.text;
+        if (Path.GetFileName(selectedFolderPath) == desiredName) return;
+
+        string finalName;
+        string parentDir = Path.GetDirectoryName(selectedFolderPath);
+
+        // Use a folder-specific version of your unique path helper
+        string newPath = GetUniqueFolderPath(parentDir, desiredName, out finalName);
+
+        try
+        {
+            Directory.Move(selectedFolderPath, newPath);
+            selectedFolderPath = newPath;
+            titleEditor.text = finalName;
+
+            LoadHierarchicalNotes(); // Refresh the sidebar
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Folder Rename Failed: " + e.Message);
+        }
+    }
+
+    private string GetUniqueFolderPath(string parent, string baseName, out string finalName)
+    {
+        string folderName = baseName;
+        string fullPath = Path.Combine(parent, folderName);
+        int counter = 1;
+
+        while (Directory.Exists(fullPath))
+        {
+            folderName = $"{baseName} {counter}";
+            fullPath = Path.Combine(parent, folderName);
+            counter++;
+        }
+
+        finalName = folderName;
+        return fullPath;
+    }
+
     public void DeleteNote()
     {
         if (string.IsNullOrEmpty(currentNotePath)) return;
         if (File.Exists(currentNotePath))
         {
             File.Delete(currentNotePath);
+            Debug.Log("Deleted note at: " + currentNotePath);
         }
 
         ClearEditorUI();
-        LoadNotes();
+        LoadHierarchicalNotes();
+    }
+
+    public void DeleteFolder()
+    {
+        // Ensure we aren't trying to delete the root "Notes" folder
+        if (string.IsNullOrEmpty(selectedFolderPath) || selectedFolderPath == folderPath)
+        {
+            Debug.LogWarning("Cannot delete the root directory or no folder selected.");
+            return;
+        }
+
+        if (Directory.Exists(selectedFolderPath))
+        {
+            // true means it will delete all files and subfolders inside
+            Directory.Delete(selectedFolderPath, true);
+
+            // Reset selection to root so the next note doesn't try to save to a deleted path
+            selectedFolderPath = folderPath;
+
+
+            LoadHierarchicalNotes();
+            ClearEditorUI();
+
+            Debug.Log("Folder deleted successfully.");
+        }
     }
 
     public void ClearEditorUI()
